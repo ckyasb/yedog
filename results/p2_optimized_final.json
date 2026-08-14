@@ -1,0 +1,56 @@
+{
+  "baseline_ridge": {
+    "features": [
+      "C1",
+      "Q1",
+      "C2"
+    ],
+    "r2_loo": 0.31,
+    "note": "原始模型"
+  },
+  "optimized_ridge_poly2": {
+    "features": [
+      "C1",
+      "Q1",
+      "C2",
+      "is_new",
+      "E_low",
+      "E_high"
+    ],
+    "degree": 2,
+    "r2_loo": 0.441,
+    "note": "最佳岭回归"
+  },
+  "rf_with_is_new": {
+    "features": [
+      "C1",
+      "Q1",
+      "C2",
+      "is_new"
+    ],
+    "r2_loo": 0.423,
+    "note": "随机森林"
+  },
+  "gbr": {
+    "features": [
+      "C1",
+      "Q1",
+      "C2",
+      "is_new",
+      "E_low",
+      "E_high"
+    ],
+    "r2_loo": 0.432,
+    "note": "GBR"
+  },
+  "ensemble_best": {
+    "weights": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "r2_loo": 0.441,
+    "note": "集成退化为岭回归"
+  },
+  "key_finding": "NEWSTRUCTURE标记是关键混杂变量，加入后R²提升13-16个百分点"
+}

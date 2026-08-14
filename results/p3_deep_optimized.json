@@ -1,0 +1,56 @@
+{
+  "ensemble_weights": [
+    0.8500000000000001,
+    0.0,
+    0.0,
+    0.1499999999999999
+  ],
+  "ensemble_r2": 0.9249256803804129,
+  "life_test": [
+    {
+      "battery_id": 2,
+      "policy": "3_6C-80PER_3_6C",
+      "life_opt": 99999.0
+    },
+    {
+      "battery_id": 5,
+      "policy": "80PER_3_6C",
+      "life_opt": 59932.716761370495
+    },
+    {
+      "battery_id": 9,
+      "policy": "4_8C_80PER_4_8C",
+      "life_opt": 1800.0147520351627
+    },
+    {
+      "battery_id": 10,
+      "policy": "5C_67PER_4C_NEWSTRUCTURE",
+      "life_opt": 10729.045239670008
+    },
+    {
+      "battery_id": 11,
+      "policy": "5_3C_54PER_4C_NEWSTRUCTURE",
+      "life_opt": 9177.934976493452
+    },
+    {
+      "battery_id": 14,
+      "policy": "5_6C_19PER_4_6C_NEWSTRUCTURE",
+      "life_opt": 10657.453600824418
+    },
+    {
+      "battery_id": 16,
+      "policy": "3_7C_31PER_5_9C_NEWSTRUCTURE",
+      "life_opt": 1203.3400067113548
+    },
+    {
+      "battery_id": 24,
+      "policy": "5_6C_36PER_4_3C_NEWSTRUCTURE",
+      "life_opt": 43814.917946952264
+    },
+    {
+      "battery_id": 25,
+      "policy": "4_8C_80PER_4_8C_NEWSTRUCTURE",
+      "life_opt": 6359.658689853805
+    }
+  ]
+}

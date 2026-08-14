@@ -1,0 +1,53 @@
+{
+  "rmse_mean": 0.0014868203814187222,
+  "rmse_med": 0.0010672540093251174,
+  "mae_mean": 0.001273055751942852,
+  "life_test": [
+    {
+      "battery_id": 2,
+      "policy": "3_6C-80PER_3_6C",
+      "life_direct": 18792.77907383655
+    },
+    {
+      "battery_id": 5,
+      "policy": "80PER_3_6C",
+      "life_direct": 11627.649246505072
+    },
+    {
+      "battery_id": 9,
+      "policy": "4_8C_80PER_4_8C",
+      "life_direct": 2876.247171872512
+    },
+    {
+      "battery_id": 10,
+      "policy": "5C_67PER_4C_NEWSTRUCTURE",
+      "life_direct": 14087.05837599246
+    },
+    {
+      "battery_id": 11,
+      "policy": "5_3C_54PER_4C_NEWSTRUCTURE",
+      "life_direct": 11061.249239357536
+    },
+    {
+      "battery_id": 14,
+      "policy": "5_6C_19PER_4_6C_NEWSTRUCTURE",
+      "life_direct": 15133.126627470698
+    },
+    {
+      "battery_id": 16,
+      "policy": "3_7C_31PER_5_9C_NEWSTRUCTURE",
+      "life_direct": 1365.8997672410662
+    },
+    {
+      "battery_id": 24,
+      "policy": "5_6C_36PER_4_3C_NEWSTRUCTURE",
+      "life_direct": 16804.904581788673
+    },
+    {
+      "battery_id": 25,
+      "policy": "4_8C_80PER_4_8C_NEWSTRUCTURE",
+      "life_direct": 13512.23481445279
+    }
+  ],
+  "method": "direct_multistep_with_target_cycle"
+}

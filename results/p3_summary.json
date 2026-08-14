@@ -1,0 +1,138 @@
+{
+  "best_model": "rf",
+  "holdout": {
+    "linear": {
+      "rmse_mean": 0.0013222395986918927,
+      "rmse_med": 0.0011619618633598298,
+      "mae_mean": 0.0012645628610936455,
+      "mape_mean": 0.12748040712964182
+    },
+    "exp": {
+      "rmse_mean": 0.0013215115216202295,
+      "rmse_med": 0.0011633137719562119,
+      "mae_mean": 0.0012632065382295501,
+      "mape_mean": 0.1273645251601946
+    },
+    "rf": {
+      "rmse_mean": 0.0013104199581532687,
+      "rmse_med": 0.0010095039139033494,
+      "mae_mean": 0.0011041444910230265,
+      "mape_mean": 0.11191832509648351
+    }
+  },
+  "length_sensitivity": {
+    "50": {
+      "linear_rmse_mean": 0.0022411081052029144,
+      "rf_rmse_mean": 0.001472805876229104
+    },
+    "100": {
+      "linear_rmse_mean": 0.001448659704080293,
+      "rf_rmse_mean": 0.0013243520581516723
+    },
+    "150": {
+      "linear_rmse_mean": 0.0013222395986918927,
+      "rf_rmse_mean": 0.0013104199581532687
+    }
+  },
+  "test_life": [
+    {
+      "battery_id": 2,
+      "policy": "3_6C-80PER_3_6C",
+      "C1": 3.6,
+      "Q1": 80.0,
+      "C2": 3.6,
+      "life_main": 18994.843844387975,
+      "life_linear": 24260.812603234146,
+      "life_exp": 24269.11028375746,
+      "model": "rf"
+    },
+    {
+      "battery_id": 5,
+      "policy": "80PER_3_6C",
+      "C1": 3.6,
+      "Q1": 80.0,
+      "C2": 3.6,
+      "life_main": 11621.686030827861,
+      "life_linear": 13609.905471765478,
+      "life_exp": 13612.021403877428,
+      "model": "rf"
+    },
+    {
+      "battery_id": 9,
+      "policy": "4_8C_80PER_4_8C",
+      "C1": 4.8,
+      "Q1": 80.0,
+      "C2": 4.8,
+      "life_main": 2583.978573335042,
+      "life_linear": 2989.7642760592475,
+      "life_exp": 2992.8461119439835,
+      "model": "rf"
+    },
+    {
+      "battery_id": 10,
+      "policy": "5C_67PER_4C_NEWSTRUCTURE",
+      "C1": 5.0,
+      "Q1": 67.0,
+      "C2": 4.0,
+      "life_main": 11199.990247269108,
+      "life_linear": 14489.136422601488,
+      "life_exp": 14492.275452665432,
+      "model": "rf"
+    },
+    {
+      "battery_id": 11,
+      "policy": "5_3C_54PER_4C_NEWSTRUCTURE",
+      "C1": 5.3,
+      "Q1": 54.0,
+      "C2": 4.0,
+      "life_main": 10073.086153028717,
+      "life_linear": 10333.22689329384,
+      "life_exp": 10337.15238008955,
+      "model": "rf"
+    },
+    {
+      "battery_id": 14,
+      "policy": "5_6C_19PER_4_6C_NEWSTRUCTURE",
+      "C1": 5.6,
+      "Q1": 19.0,
+      "C2": 4.6,
+      "life_main": 14895.49489904375,
+      "life_linear": 15525.07337614321,
+      "life_exp": 15527.916121838694,
+      "model": "rf"
+    },
+    {
+      "battery_id": 16,
+      "policy": "3_7C_31PER_5_9C_NEWSTRUCTURE",
+      "C1": 3.7,
+      "Q1": 31.0,
+      "C2": 5.9,
+      "life_main": 1329.940933058661,
+      "life_linear": 1055.8001826590212,
+      "life_exp": 1060.5274671539469,
+      "model": "rf"
+    },
+    {
+      "battery_id": 24,
+      "policy": "5_6C_36PER_4_3C_NEWSTRUCTURE",
+      "C1": 5.6,
+      "Q1": 36.0,
+      "C2": 4.3,
+      "life_main": 16769.885344926846,
+      "life_linear": 22350.878183827554,
+      "life_exp": 22352.56627268546,
+      "model": "rf"
+    },
+    {
+      "battery_id": 25,
+      "policy": "4_8C_80PER_4_8C_NEWSTRUCTURE",
+      "C1": 4.8,
+      "Q1": 80.0,
+      "C2": 4.8,
+      "life_main": 13117.324605745984,
+      "life_linear": 13127.225126291843,
+      "life_exp": 13130.878479223646,
+      "model": "rf"
+    }
+  ]
+}

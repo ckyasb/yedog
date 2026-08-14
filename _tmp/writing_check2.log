@@ -1,0 +1,31 @@
+INFO: paper dir: paper
+INFO: root dir: /home/ckyasb/yegou/A
+INFO: main file: paper/main.typ
+INFO: sections dir: paper/sections
+INFO: figures dir: figures
+INFO: results file: reports/RESULTS_REPORT.md
+INFO: detected engine: Typst (main suffix: .typ)
+INFO: section file count: 9
+INFO: main include count: 9
+INFO: section length: 1_restatement.typ 1300 chars
+INFO: section length: 2_assumptions.typ 623 chars
+WARN: section is short: 2_assumptions.typ (623 chars)
+INFO: section length: 3_symbols.typ 852 chars
+INFO: section length: 4_problem1.typ 3148 chars
+INFO: section length: 5_problem2.typ 3121 chars
+INFO: section length: 6_problem3.typ 3741 chars
+INFO: section length: 7_sensitivity.typ 3492 chars
+INFO: section length: 8_evaluation.typ 712 chars
+WARN: section is short: 8_evaluation.typ (712 chars)
+INFO: section length: A_code.typ 44065 chars
+INFO: section title order:
+INFO:   1. 1_restatement.typ -> 问题重述
+INFO:   2. 2_assumptions.typ -> 模型假设
+INFO:   3. 3_symbols.typ -> 符号说明
+INFO:   4. 4_problem1.typ -> 问题一：数据整理与快充策略对寿命影响初步分析
+INFO:   5. 5_problem2.typ -> 问题二：充电策略参数对寿命衰减的影响分析
+INFO:   6. 6_problem3.typ -> 问题三：电池寿命预测
+INFO:   7. 7_sensitivity.typ -> 问题四：兼顾充电时间与寿命衰减的充电策略优化
+INFO:   8. 8_evaluation.typ -> 模型评价与推广
+INFO: citation markers detected
+PASS: writing text gate passed
