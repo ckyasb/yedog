@@ -1,0 +1,49 @@
+﻿match_id,competition,stage,group_id,round_in_group,team_a,team_b,venue,city,country,date,local_kickoff_time,utc_datetime,goals_a,goals_b,source_url,retrieval_date
+WC22_001,World Cup,Group,A,1,Qatar,Ecuador,Al Bayt,Al Khor,Qatar,2022-11-20,19:00,2022-11-20 16:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_002,World Cup,Group,A,1,Senegal,Netherlands,Al Thumama,Doha,Qatar,2022-11-21,13:00,2022-11-21 10:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_003,World Cup,Group,A,2,Qatar,Senegal,Al Thumama,Doha,Qatar,2022-11-25,16:00,2022-11-25 13:00,1,3,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_004,World Cup,Group,A,2,Netherlands,Ecuador,Khalifa Intl,Al Rayyan,Qatar,2022-11-25,19:00,2022-11-25 16:00,1,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_005,World Cup,Group,A,3,Ecuador,Senegal,Khalifa Intl,Al Rayyan,Qatar,2022-11-29,18:00,2022-11-29 15:00,1,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_006,World Cup,Group,A,3,Netherlands,Qatar,Al Bayt,Al Khor,Qatar,2022-11-29,18:00,2022-11-29 15:00,2,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_007,World Cup,Group,B,1,England,Iran,Khalifa Intl,Al Rayyan,Qatar,2022-11-21,16:00,2022-11-21 13:00,6,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_008,World Cup,Group,B,1,USA,Wales,Ahmed bin Ali,Al Rayyan,Qatar,2022-11-21,22:00,2022-11-21 19:00,1,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_009,World Cup,Group,B,2,Wales,Iran,Ahmed bin Ali,Al Rayyan,Qatar,2022-11-25,13:00,2022-11-25 10:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_010,World Cup,Group,B,2,England,USA,Al Bayt,Al Khor,Qatar,2022-11-25,22:00,2022-11-25 19:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_011,World Cup,Group,B,3,Wales,England,Ahmed bin Ali,Al Rayyan,Qatar,2022-11-29,22:00,2022-11-29 19:00,0,3,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_012,World Cup,Group,B,3,Iran,USA,Al Thumama,Doha,Qatar,2022-11-29,22:00,2022-11-29 19:00,0,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_013,World Cup,Group,C,1,Argentina,Saudi Arabia,Lusail,Lusail,Qatar,2022-11-22,13:00,2022-11-22 10:00,1,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_014,World Cup,Group,C,1,Mexico,Poland,Stadium 974,Doha,Qatar,2022-11-22,19:00,2022-11-22 16:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_015,World Cup,Group,C,2,Poland,Saudi Arabia,Education City,Al Rayyan,Qatar,2022-11-26,16:00,2022-11-26 13:00,2,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_016,World Cup,Group,C,2,Argentina,Mexico,Lusail,Lusail,Qatar,2022-11-26,22:00,2022-11-26 19:00,2,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_017,World Cup,Group,C,3,Poland,Argentina,Stadium 974,Doha,Qatar,2022-11-30,22:00,2022-11-30 19:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_018,World Cup,Group,C,3,Saudi Arabia,Mexico,Lusail,Lusail,Qatar,2022-11-30,22:00,2022-11-30 19:00,1,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_019,World Cup,Group,D,1,Denmark,Tunisia,Education City,Al Rayyan,Qatar,2022-11-22,16:00,2022-11-22 13:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_020,World Cup,Group,D,1,France,Australia,Al Janoub,Al Wakrah,Qatar,2022-11-22,22:00,2022-11-22 19:00,4,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_021,World Cup,Group,D,2,Tunisia,Australia,Al Janoub,Al Wakrah,Qatar,2022-11-26,13:00,2022-11-26 10:00,0,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_022,World Cup,Group,D,2,France,Denmark,Stadium 974,Doha,Qatar,2022-11-26,16:00,2022-11-26 13:00,2,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_023,World Cup,Group,D,3,Australia,Denmark,Al Janoub,Al Wakrah,Qatar,2022-11-30,18:00,2022-11-30 15:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_024,World Cup,Group,D,3,Tunisia,France,Education City,Al Rayyan,Qatar,2022-11-30,18:00,2022-11-30 15:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_025,World Cup,Group,E,1,Germany,Japan,Khalifa Intl,Al Rayyan,Qatar,2022-11-23,16:00,2022-11-23 13:00,1,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_026,World Cup,Group,E,1,Spain,Costa Rica,Al Thumama,Doha,Qatar,2022-11-23,19:00,2022-11-23 16:00,7,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_027,World Cup,Group,E,2,Japan,Costa Rica,Ahmed bin Ali,Al Rayyan,Qatar,2022-11-27,13:00,2022-11-27 10:00,0,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_028,World Cup,Group,E,2,Spain,Germany,Al Bayt,Al Khor,Qatar,2022-11-27,22:00,2022-11-27 19:00,1,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_029,World Cup,Group,E,3,Japan,Spain,Khalifa Intl,Al Rayyan,Qatar,2022-12-01,22:00,2022-12-01 19:00,2,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_030,World Cup,Group,E,3,Costa Rica,Germany,Al Bayt,Al Khor,Qatar,2022-12-01,22:00,2022-12-01 19:00,2,4,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_031,World Cup,Group,F,1,Morocco,Croatia,Al Bayt,Al Khor,Qatar,2022-11-23,13:00,2022-11-23 10:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_032,World Cup,Group,F,1,Belgium,Canada,Ahmed bin Ali,Al Rayyan,Qatar,2022-11-23,22:00,2022-11-23 19:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_033,World Cup,Group,F,2,Croatia,Canada,Khalifa Intl,Al Rayyan,Qatar,2022-11-27,18:00,2022-11-27 15:00,4,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_034,World Cup,Group,F,2,Belgium,Morocco,Al Thumama,Doha,Qatar,2022-11-27,14:00,2022-11-27 11:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_035,World Cup,Group,F,3,Croatia,Belgium,Ahmed bin Ali,Al Rayyan,Qatar,2022-12-01,18:00,2022-12-01 15:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_036,World Cup,Group,F,3,Canada,Morocco,Al Thumama,Doha,Qatar,2022-12-01,18:00,2022-12-01 15:00,1,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_037,World Cup,Group,G,1,Switzerland,Cameroon,Al Janoub,Al Wakrah,Qatar,2022-11-24,13:00,2022-11-24 10:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_038,World Cup,Group,G,1,Brazil,Serbia,Lusail,Lusail,Qatar,2022-11-24,22:00,2022-11-24 19:00,2,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_039,World Cup,Group,G,2,Cameroon,Serbia,Al Janoub,Al Wakrah,Qatar,2022-11-28,10:00,2022-11-28 07:00,3,3,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_040,World Cup,Group,G,2,Brazil,Switzerland,Stadium 974,Doha,Qatar,2022-11-28,13:00,2022-11-28 10:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_041,World Cup,Group,G,3,Serbia,Switzerland,Stadium 974,Doha,Qatar,2022-12-02,22:00,2022-12-02 19:00,2,3,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_042,World Cup,Group,G,3,Cameroon,Brazil,Lusail,Lusail,Qatar,2022-12-02,22:00,2022-12-02 19:00,1,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_043,World Cup,Group,H,1,Uruguay,South Korea,Education City,Al Rayyan,Qatar,2022-11-24,16:00,2022-11-24 13:00,0,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_044,World Cup,Group,H,1,Portugal,Ghana,Stadium 974,Doha,Qatar,2022-11-24,19:00,2022-11-24 16:00,3,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_045,World Cup,Group,H,2,South Korea,Ghana,Education City,Al Rayyan,Qatar,2022-11-28,16:00,2022-11-28 13:00,2,3,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_046,World Cup,Group,H,2,Portugal,Uruguay,Lusail,Lusail,Qatar,2022-11-28,22:00,2022-11-28 19:00,2,0,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_047,World Cup,Group,H,3,South Korea,Portugal,Education City,Al Rayyan,Qatar,2022-12-02,18:00,2022-12-02 15:00,2,1,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14
+WC22_048,World Cup,Group,H,3,Ghana,Uruguay,Al Janoub,Al Wakrah,Qatar,2022-12-02,18:00,2022-12-02 15:00,0,2,https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/qatar2022,2026-08-14

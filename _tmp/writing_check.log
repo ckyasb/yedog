@@ -1,0 +1,37 @@
+INFO: paper dir: paper
+INFO: root dir: /home/ckyasb/yegou/C题
+INFO: main file: paper/main.typ
+INFO: sections dir: paper/sections
+INFO: figures dir: figures
+INFO: results file: reports/RESULTS_REPORT.md
+INFO: detected engine: Typst (main suffix: .typ)
+INFO: section file count: 11
+INFO: main include count: 10
+WARN: numbered section sequence has gaps: [9]
+INFO: section length: 1_restatement.typ 1281 chars
+INFO: section length: 2_analysis.typ 1417 chars
+INFO: section length: 3_assumptions.typ 901 chars
+INFO: section length: 4_symbols.typ 1463 chars
+INFO: section length: 5_problem1.typ 1964 chars
+INFO: section length: 6_problem2.typ 3276 chars
+INFO: section length: 7_problem3.typ 3162 chars
+INFO: section length: 8_problem4.typ 1451 chars
+INFO: section length: 10_sensitivity.typ 682 chars
+WARN: section is short: 10_sensitivity.typ (682 chars)
+INFO: section length: 11_evaluation.typ 613 chars
+WARN: section is short: 11_evaluation.typ (613 chars)
+INFO: section length: A_code.typ 3732 chars
+INFO: section title order:
+INFO:   1. 1_restatement.typ -> 问题重述与分析
+INFO:   2. 2_analysis.typ -> 问题分析
+INFO:   3. 3_assumptions.typ -> 模型假设
+INFO:   4. 4_symbols.typ -> 符号说明
+INFO:   5. 5_problem1.typ -> 问题一：转播观看人数预测
+INFO:   6. 6_problem2.typ -> 问题二：小组赛场馆与开球时段协同优化
+INFO:   7. 7_problem3.typ -> 问题三：第三轮动态资源优化
+INFO:   8. 8_problem4.typ -> 问题四：实际赛程综合评价
+INFO:   9. 10_sensitivity.typ -> 灵敏度分析
+INFO:   10. 11_evaluation.typ -> 模型评价与推广
+WARN: paper/references.typ exists but no citation markers detected in paper
+INFO: all-results JSON not supplied/found; skip JSON numeric scan
+PASS: writing text gate passed

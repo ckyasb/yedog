@@ -1,0 +1,73 @@
+﻿match_id,team_a,team_b,predicted_tv_viewers
+GA01,Mexico,South Africa,143.3364
+GA02,South Korea,Czechia,162.8769
+GA03,Mexico,South Korea,167.3814
+GA04,South Africa,Czechia,149.1626
+GA05,Mexico,Czechia,151.755
+GA06,South Africa,South Korea,153.1637
+GB01,Canada,Bosnia and Herzegovina,167.3309
+GB02,Qatar,Switzerland,156.6954
+GB03,Canada,Qatar,163.5991
+GB04,Bosnia and Herzegovina,Switzerland,158.5332
+GB05,Canada,Switzerland,175.9018
+GB06,Bosnia and Herzegovina,Qatar,154.689
+GC01,Brazil,Morocco,193.2727
+GC02,Haiti,Scotland,144.5058
+GC03,Brazil,Haiti,150.3701
+GC04,Morocco,Scotland,173.7179
+GC05,Brazil,Scotland,170.1002
+GC06,Morocco,Haiti,151.7628
+GD01,United States,Paraguay,172.303
+GD02,Australia,Turkey,178.4709
+GD03,United States,Australia,171.4465
+GD04,Paraguay,Turkey,183.1712
+GD05,United States,Turkey,181.5097
+GD06,Paraguay,Australia,172.4093
+GE01,Germany,Curacao,151.5826
+GE02,Ivory Coast,Ecuador,182.2018
+GE03,Germany,Ivory Coast,181.4077
+GE04,Curacao,Ecuador,150.4944
+GE05,Germany,Ecuador,187.6876
+GE06,Curacao,Ivory Coast,151.3788
+GF01,Netherlands,Japan,194.205
+GF02,Sweden,Tunisia,159.1748
+GF03,Netherlands,Sweden,179.7383
+GF04,Japan,Tunisia,169.5916
+GF05,Netherlands,Tunisia,160.4418
+GF06,Japan,Sweden,188.1732
+GG01,Belgium,Egypt,169.2205
+GG02,Iran,New Zealand,149.0276
+GG03,Belgium,Iran,173.0804
+GG04,Egypt,New Zealand,150.8993
+GG05,Belgium,New Zealand,153.9609
+GG06,Egypt,Iran,166.4209
+GH01,Spain,Cape Verde,158.2169
+GH02,Saudi Arabia,Uruguay,162.6627
+GH03,Spain,Saudi Arabia,159.4792
+GH04,Cape Verde,Uruguay,159.357
+GH05,Spain,Uruguay,198.3061
+GH06,Cape Verde,Saudi Arabia,149.1905
+GI01,France,Senegal,176.1858
+GI02,Iraq,Norway,155.2427
+GI03,France,Iraq,153.5573
+GI04,Senegal,Norway,173.3318
+GI05,France,Norway,170.8377
+GI06,Senegal,Iraq,155.331
+GJ01,Argentina,Algeria,168.5051
+GJ02,Austria,Jordan,163.7019
+GJ03,Argentina,Austria,183.7741
+GJ04,Algeria,Jordan,160.6749
+GJ05,Argentina,Jordan,154.6706
+GJ06,Algeria,Austria,176.0068
+GK01,Portugal,DR Congo,147.184
+GK02,Uzbekistan,Colombia,167.9997
+GK03,Portugal,Uzbekistan,153.8928
+GK04,DR Congo,Colombia,160.7579
+GK05,Portugal,Colombia,189.2539
+GK06,DR Congo,Uzbekistan,151.3886
+GL01,England,Croatia,187.9489
+GL02,Ghana,Panama,138.922
+GL03,England,Ghana,165.2574
+GL04,Croatia,Panama,141.3943
+GL05,England,Panama,145.7827
+GL06,Croatia,Ghana,160.066

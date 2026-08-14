@@ -1,0 +1,75 @@
+{
+  "Z2": 19.083162,
+  "terms": {
+    "T": 0.3746114435923284,
+    "B": 0.4872465555099626,
+    "U": 0.4614361111111111,
+    "H": 0.6396986111111111,
+    "C": 0.41785914702581367,
+    "D": 0.4495520354171898,
+    "F": 0.6666666666666666,
+    "R": 0.4258705734755149,
+    "T_raw_mean": 3970978.75,
+    "B_raw_mean": 4.883056813463889,
+    "C_raw_mean": 1568680.5555555555
+  },
+  "violations": {
+    "venue_slot_clash": 0,
+    "rest_60h_violation": 0,
+    "venue_per_day_violation": 0,
+    "venue_total_min_violation": 0,
+    "venue_total_max_violation": 0,
+    "gold_fairness_violation": 0,
+    "security_eligibility_violation": 0,
+    "r3_daily_high_security_violation": 0,
+    "broadcast_capacity_violation": 0,
+    "same_group_round_slot_clash": 0,
+    "total_violations": 0
+  },
+  "n_starts": 6,
+  "history": [
+    {
+      "start": 0,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.07582873492437,
+      "viol_init": 7,
+      "viol_sa": 0
+    },
+    {
+      "start": 1,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.10138887236079,
+      "viol_init": 7,
+      "viol_sa": 0
+    },
+    {
+      "start": 2,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.16366578686043,
+      "viol_init": 7,
+      "viol_sa": 0
+    },
+    {
+      "start": 3,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.097043915436885,
+      "viol_init": 7,
+      "viol_sa": 0
+    },
+    {
+      "start": 4,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.153456117560616,
+      "viol_init": 7,
+      "viol_sa": 0
+    },
+    {
+      "start": 5,
+      "Z_init": 18.659328552318808,
+      "Z_sa": 19.06814840067364,
+      "viol_init": 7,
+      "viol_sa": 0
+    }
+  ],
+  "seed": 20260814
+}
