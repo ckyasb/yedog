@@ -1,0 +1,59 @@
+<mxfile host="65bd74444e">
+  <diagram name="Q1求解流程" id="flowq1">
+    <mxGraphModel dx="1100" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="t" value="问题一 单向出海运输 求解流程" style="text;html=1;align=center;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="280" y="10" width="340" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="s" value="开始: peopleQ1.csv (1600出海需求) + distances.csv" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="290" y="50" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="d1" value="按dest设施分组 (52个目的设施, 各19-51人)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="110" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="d2" value="设施聚类 (同机场近邻≤5设施/簇, 贪心近邻)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="166" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="d3" value="机型选择: min ceil(N/seat)·trip_time (T1/T2/T3 比较)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="222" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="d4" value="路线构造 make_route: TSP序 + 加油点插入 (≤2个)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="278" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="gate" value="续航门控 fuel_feasible?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="335" y="334" width="230" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="repair" value="换机型/换序/插加油点&#10;(最多2个可加油设施)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="590" y="338" width="180" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="d5" value="初始解: 单设施独立解 (110架次, 17666min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="410" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="alns" value="ALNS优化&#10;destroy: 移除簇/重分批&#10;repair: regret贪心重聚类&#10;接受: SA式 (ΔT≤0必接受)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="290" y="466" width="320" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="ref" value="第二层优化 refine: 换机型降油耗 (时间不增)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="290" y="556" width="320" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="end" value="输出 q1-routes.csv + q1-assignments.csv&#10;总飞机使用时间17612min, gap=4.2%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="270" y="612" width="360" height="40" as="geometry"/>
+        </mxCell>
+        <!-- edges -->
+        <mxCell e1="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="s" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e2="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="d1" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e3="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="d2" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e4="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="d3" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e5="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="d4" target="gate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e6="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="gate" target="repair"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e6b="1" parent="1" value="否" style="edgeStyle=orthogonalEdgeStyle;" source="gate" target="repair"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e7="1" parent="1" value="是" style="edgeStyle=orthogonalEdgeStyle;" source="gate" target="d5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e8="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="repair" target="d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e9="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="d5" target="alns"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e10="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="alns" target="ref"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e11="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="ref" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

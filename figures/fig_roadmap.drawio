@@ -1,0 +1,52 @@
+<mxfile host="65bd74444e">
+  <diagram name="技术路线图" id="roadmap">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <!-- 顶部：赛题输入 -->
+        <mxCell id="title" value="海上油田人员直升机运载计划编排" style="text;html=1;align=center;fontSize=16;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="384" y="20" width="400" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="data" value="输入数据&#10;distances.csv (55×55距离矩阵)&#10;peopleQ1/Q2/Q3.csv (需求)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="409" y="60" width="350" height="50" as="geometry"/>
+        </mxCell>
+        <!-- 中部：预处理 -->
+        <mxCell id="pre" value="预处理&#10;距离矩阵校验(对称/对角0) · 续航可达性分析(T1/T2/T3往返需加油设施) · 最近机场匹配" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="359" y="135" width="450" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell e1edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="data" target="pre"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- 三问并列 -->
+        <mxCell id="q1" value="问题一 单向出海&#10;(1600人, 无时间窗)&#10;&#10;聚类(≤5设施/簇)&#10;+节约构造&#10;+机型选择&#10;+ALNS优化&#10;+续航门控" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="60" y="210" width="300" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="q2" value="问题二 出海+海返+穿梭&#10;(4000人, 无时间窗)&#10;&#10;PDPTW配对(往返环)&#10;+座位动态复用&#10;+穿梭嵌入&#10;+ALNS邻域&#10;+续航门控" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="434" y="210" width="300" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="q3" value="问题三 带时间窗多日排班&#10;(4000人, 24架飞机)&#10;&#10;阶段A: 非临时排班→T0&#10;阶段B: 临时增量插入&#10;(can_join免时间+新开≤T0)&#10;+时间窗/周转/配额&#10;+续航门控" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="808" y="210" width="300" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell e2="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="pre" target="q1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e3="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="pre" target="q2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e4="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="pre" target="q3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- 下界与校验 -->
+        <mxCell id="lb" value="下界推导与gap分析&#10;Q1: per-facility强下界(4.2%)&#10;Q2: 出海+海返+穿梭合并下界(5.3%)&#10;Q3: T0预算+临时满足率" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="309" y="410" width="550" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell e5="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="q1" target="lb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e6="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="q2" target="lb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e7="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="q3" target="lb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- 校验 -->
+        <mxCell id="val" value="独立校验 validate.py&#10;首末同机场·≤5站·refuel合法·续航可行·pickup&lt;delivery·座位不超载·时刻链·运营窗·周转" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="284" y="490" width="600" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell e8="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="lb" target="val"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- 输出 -->
+        <mxCell id="out" value="输出&#10;q1/q2/q3-routes.csv + assignments.csv · 五项指标 · figures/ · 论文" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="359" y="560" width="450" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell e9="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="val" target="out"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

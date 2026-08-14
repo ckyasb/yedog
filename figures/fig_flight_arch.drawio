@@ -1,0 +1,61 @@
+<mxfile host="65bd74444e">
+  <diagram name="架次架构示意" id="flightarch">
+    <mxGraphModel dx="1200" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="t" value="架次架构示意：出海 + 海返 + 穿梭 联合运输与座位动态复用" style="text;html=1;align=center;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="560" height="25" as="geometry"/>
+        </mxCell>
+        <!-- 机场 A -->
+        <mxCell id="A" value="陆地机场 A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="100" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="A2" value="陆地机场 A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1020" y="300" width="100" height="50" as="geometry"/>
+        </mxCell>
+        <!-- 设施 F001, F002 -->
+        <mxCell id="F1" value="设施 F001" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="340" y="300" width="100" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="F2" value="设施 F002" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="100" height="50" as="geometry"/>
+        </mxCell>
+        <!-- 航段线 -->
+        <mxCell seg1="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#4C72B0;strokeWidth=3;" source="A" target="F1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell seg2="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#4C72B0;strokeWidth=3;" source="F1" target="F2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell seg3="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#4C72B0;strokeWidth=3;" source="F2" target="A2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- 人员标注 -->
+        <!-- seg0: A->F1 出海人员 -->
+        <mxCell id="out" value="出海人员 (陆→F001)&#10;pickup=机场, delivery=F001&#10;机上人数: 4 (绿色去F001, 橙色去F002)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5e1;strokeColor=#82b366;fontSize=9" vertex="1" parent="1">
+          <mxGeometry x="200" y="180" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell eo="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#82b366;" source="out" target="seg1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- seg1: F1->F2 穿梭人员 -->
+        <mxCell id="shu" value="穿梭人员 (F001→F002)&#10;pickup=F001, delivery=F002&#10;机上人数: 1 (先下出海再上穿梭)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e1;strokeColor=#d79b00;fontSize=9" vertex="1" parent="1">
+          <mxGeometry x="470" y="380" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell es="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#d79b00;" source="shu" target="seg2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- seg2: F2->A 海返人员 -->
+        <mxCell id="ret" value="海返人员 (F002→陆)&#10;pickup=F002, delivery=机场&#10;机上人数: 3 (F002下穿梭后上海返)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#b85450;fontSize=9" vertex="1" parent="1">
+          <mxGeometry x="780" y="180" width="240" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell er="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#b85450;" source="ret" target="seg3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- 座位时序图 -->
+        <mxCell id="seat" value="座位时序 (先下后上, 即时复用):&#10;seg0 (A→F001): 出海4人 [■■■■]&#10;seg1 (F001→F002): 出海3(去F002)+穿梭1 = 4人 [■■■■]  (F001下1人后上1穿梭)&#10;seg2 (F002→A): 海返3人 [■■■]  (F002下4人后上3海返)&#10;同一架次运 4+1+3=8人, 座位峰值=4 ≤ C_t" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=10;align=left;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="320" y="500" width="520" height="100" as="geometry"/>
+        </mxCell>
+        <!-- 续航 -->
+        <mxCell id="fuel" value="续航: 满油起飞→各段扣油耗→到任意点(含返场)余油≥安全余油&#10;可在F001/F002若为可加油设施(8个之一)选择加满(refuel=1, 停靠≥20min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9" vertex="1" parent="1">
+          <mxGeometry x="300" y="620" width="560" height="46" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

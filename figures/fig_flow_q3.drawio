@@ -1,0 +1,70 @@
+<mxfile host="65bd74444e">
+  <diagram name="Q3求解流程" id="flowq3">
+    <mxGraphModel dx="1150" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="820" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="t" value="问题三 带时间窗多日排班 求解流程 (两阶段)" style="text;html=1;align=center;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="10" width="400" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="s" value="开始: peopleQ3.csv (4000人 + 时间窗 + task_type) + 24架飞机表" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="320" y="50" width="400" height="36" as="geometry"/>
+        </mxCell>
+        <!-- 阶段A -->
+        <mxCell id="aBox" value="阶段 A: 非临时排班 (3840条: shift3440+production360+emergency40)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=11;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="970" height="320" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1" value="按(pickup时间, 优先级)全局排序&#10;紧急/生产紧窗优先占位" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="260" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" value="逐需求处理:&#10;① can_join 加入已有开放架次?&#10;(同路径·座位空·时间窗兼容)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="380" y="150" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="② 否则 try_open_trip 新开&#10;多日重试(紧窗+2日, 倒班+8日)&#10;机型T3/T2/T1 · 续航门控" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="710" y="150" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="硬约束校验: 06-18起飞 · ≤20返场 · 不过夜 · 周转≥30min · 机队配额 · 时刻链" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="180" y="230" width="660" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="a5" value="末轮补漏: 未服务者用任意机场/跨日重试" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="330" y="286" width="360" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="a6" value="得 T0 = 69979 min (非临时总飞机使用时间)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="330" y="340" width="360" height="40" as="geometry"/>
+        </mxCell>
+        <!-- 阶段B -->
+        <mxCell id="bBox" value="阶段 B: 临时增量插入 (160条 temporary)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=11;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="40" y="450" width="970" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="第一优先: can_join 插入现有架次&#10;(不增加时间, 0成本)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="80" y="490" width="280" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="第二优先: 新开架次&#10;受 T_total ≤ T0 约束" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="420" y="490" width="280" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="超额则移除最晚临时新开架次&#10;直到 T ≤ T0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="760" y="490" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="临时满足: 157/160 (98.1%, 全部0额外时间插入)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="290" y="570" width="440" height="40" as="geometry"/>
+        </mxCell>
+        <!-- 输出 -->
+        <mxCell id="end" value="输出 q3-routes.csv (带时刻) + q3-assignments.csv (temporary未安排保留空行)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="250" y="680" width="520" height="40" as="geometry"/>
+        </mxCell>
+        <!-- edges -->
+        <mxCell e1="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="s" target="aBox"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e2="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a1" target="a2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e3="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a2" target="a3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e4="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a3" target="a4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e5="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a4" target="a5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e6="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a5" target="a6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e7="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="a6" target="bBox"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e8="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="b1" target="b2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e9="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="b2" target="b3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e10="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="b3" target="b4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell e11="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;" source="b4" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
