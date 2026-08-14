@@ -1,0 +1,50 @@
+{
+  "life_test": [
+    {
+      "battery_id": 2,
+      "policy": "3_6C-80PER_3_6C",
+      "life_steady": 12325.232982585178
+    },
+    {
+      "battery_id": 5,
+      "policy": "80PER_3_6C",
+      "life_steady": 8580.369989289935
+    },
+    {
+      "battery_id": 9,
+      "policy": "4_8C_80PER_4_8C",
+      "life_steady": 2128.3130436588767
+    },
+    {
+      "battery_id": 10,
+      "policy": "5C_67PER_4C_NEWSTRUCTURE",
+      "life_steady": 8601.983215686767
+    },
+    {
+      "battery_id": 11,
+      "policy": "5_3C_54PER_4C_NEWSTRUCTURE",
+      "life_steady": 9160.799508529866
+    },
+    {
+      "battery_id": 14,
+      "policy": "5_6C_19PER_4_6C_NEWSTRUCTURE",
+      "life_steady": 12167.967207521266
+    },
+    {
+      "battery_id": 16,
+      "policy": "3_7C_31PER_5_9C_NEWSTRUCTURE",
+      "life_steady": 1362.929954009912
+    },
+    {
+      "battery_id": 24,
+      "policy": "5_6C_36PER_4_3C_NEWSTRUCTURE",
+      "life_steady": 10721.275233484608
+    },
+    {
+      "battery_id": 25,
+      "policy": "4_8C_80PER_4_8C_NEWSTRUCTURE",
+      "life_steady": 11367.769937650977
+    }
+  ],
+  "method": "steady_state_extrapolation"
+}
