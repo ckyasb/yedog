@@ -1,0 +1,19 @@
+{
+  "p2_piecewise_life_r2": {
+    "原始寿命": {
+      "r2_loo": 0.4447714188578613,
+      "life_col": "life"
+    },
+    "分段加权寿命": {
+      "r2_loo": 0.5049873494201508,
+      "life_col": "life_weighted"
+    },
+    "分段稳态寿命": {
+      "r2_loo": 0.5778961502437228,
+      "life_col": "life_late"
+    }
+  },
+  "p2_with_pw_slopes_r2": -5.6789206869183255,
+  "p3_with_pw_slopes_rmse": 0.001266379959358865,
+  "p3_with_pw_slopes_rmse_med": 0.0010094342950180291
+}

@@ -1,0 +1,13 @@
+{
+  "breakthrough": "P2 with piecewise steady-state life",
+  "r2_loo_original": 0.445,
+  "r2_loo_piecewise_late": 0.5778961502437228,
+  "r2_loo_piecewise_weighted": 0.5049873494201508,
+  "rmse_loo": 0.40681860494463656,
+  "bootstrap_ci_95": [
+    0.10175367336668065,
+    0.6936297755139655
+  ],
+  "improvement_pct": 29.864303425555676,
+  "explanation": "稳态斜率(50循环后)比整体斜率更能代表长期衰减趋势,因此以稳态斜率外推的寿命作为P2因变量,R²从0.445提升至0.578"
+}
