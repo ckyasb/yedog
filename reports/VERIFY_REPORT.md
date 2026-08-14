@@ -81,10 +81,12 @@ A_code.typ            附录代码
 | Q2 架次数 | 167 | 167 | 167 | 167 | ✅ |
 | Q2 座位利用率 | 0.5591 | 0.5591 | 0.5591 | 0.5591 | ✅ |
 | Q2 gap | 5.3% | 5.3% | 5.26% | — | ✅ |
-| Q3 T0 | 69979 min | 69979 | 69979 | 69979 | ✅ |
-| Q3 架次数 | 387 | 387 | 387 | 387 | ✅ |
-| Q3 临时满足 | 157/160 | 157/160 | 157/160 | — | ✅ |
-| Q3 非临时服务 | 3694/3840 | 3694/3840 | — | — | ✅ |
+| Q3 总飞机使用时间 | 53358 min | 53358 min | 53358 | 53358 | ✅ |
+| Q3 架次数 | 290 | 290 | 290 | 290 | ✅ |
+| Q3 临时满足 | 159/160 | 159/160 | 159/160 | — | ✅ |
+| Q3 非临时服务 | 3713/3840 | 3713/3840 | — | — | ✅ |
+| Q3 座位利用率 | 0.3563 | 0.3563 | 0.3563 | 0.3563 | ✅ |
+| Q3 人员总在途时间 | 286423 min | 286423 | 286423 | — | ✅ |
 
 validate.py 12 项指标对账全部 OK（0 MISMATCH）。
 
@@ -114,7 +116,7 @@ validate.py 12 项指标对账全部 OK（0 MISMATCH）。
 | 2 | `python3 code/data_loader.py` | <1s | 4 文件校验通过 |
 | 3 | `python3 code/problem1.py` | 1.1s | 110 架次，17612 min |
 | 4 | `python3 code/problem2.py` | 0.2s | 167 架次，28602 min |
-| 5 | `python3 code/problem3.py` | 4.5s | 387 架次，69979 min，157/160 临时 |
+| 5 | `python3 code/problem3.py` | 4.3s | 290 架次，53358 min，159/160 临时，3713/3840 非临时 |
 | 6 | `python3 code/validate.py` | <1s | Q1/Q2/Q3 PASS，12 指标 OK |
 | 7 | `python3 code/make_figures.py` | ~5s | 9 张数据图生成 |
 | 8 | `python3 code/make_drawio_pdf.py` | ~3s | 6 张非数据图 PDF 渲染 |
@@ -127,7 +129,7 @@ validate.py 12 项指标对账全部 OK（0 MISMATCH）。
 - **引擎**：Typst 0.15.1（snap）
 - **命令**：`/snap/bin/typst compile --root /home/ckyasb/yegou/B题 paper/main.typ paper/main.pdf`
 - **结果**：0 errors，13 warnings（均为 `unknown font family: times new roman / simsun / heiti sc` 等字体回退提示，不影响渲染，中文正常显示）
-- **输出**：`paper/main.pdf`，2.1 MB，23 页
+- **输出**：`paper/main.pdf`，2.1 MB（2,106,614 bytes），23 页
 
 ## PDF 视觉检查
 
