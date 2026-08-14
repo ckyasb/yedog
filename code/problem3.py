@@ -642,6 +642,54 @@ def main():
     # === 后置整合：在 temp 插入后执行架次整合（含 temp 人员）===
     all_trips = consolidate_trips(all_trips, all_req if 'all_req' in dir() else people, D,
                                   AIRCRAFT, AIRPORTS, FACILITIES, FMT, to_min, date_of, datetime)
+    # === 空位补客：整合后架次座位最空，把仍未排的非临时需求重新匹配已有架次空位。
+    # 仅当可加入已有架次（同路径、峰值座位有空、时间窗兼容）才接受——加入不增加任何飞机使用时间，
+    # 是对总飞机使用时间（主目标）零代价、对覆盖率（次目标）严格改善的字典序优化。
+    free_joined = 0
+    served_set = {pid for t in all_trips for pid, _, _, _ in t["pax"]}
+    def can_join_free(trip, p):
+        o, d = p["origin_id"], p["destination_id"]
+        stops = trip["stops"]
+        oL = (o == "LAND" or o in AIRPORTS); dL = (d == "LAND" or d in AIRPORTS)
+        if oL and d in FACILITIES: pf, df = None, d
+        elif o in FACILITIES and dL: pf, df = o, None
+        elif o in FACILITIES and d in FACILITIES: pf, df = o, d
+        else: return False, None, None
+        if pf is not None and pf not in stops: return False, None, None
+        if df is not None and df not in stops: return False, None, None
+        pi = 0 if pf is None else stops.index(pf)
+        di = len(stops)-1 if df is None else stops.index(df)
+        if pi >= di: return False, None, None
+        ep = to_min(datetime.strptime(p["earliest_pickup_time"], FMT))
+        la = to_min(datetime.strptime(p["latest_arrival_time"], FMT))
+        if trip["departures"][pi] < ep: return False, None, None
+        if trip["arrivals"][di] > la: return False, None, None
+        on=[0]*len(stops); off=[0]*len(stops)
+        for pid2, pi2, di2, _ in trip["pax"]:
+            on[pi2]+=1; off[di2]+=1
+        on[pi]+=1; off[di]+=1
+        cur=0
+        for i in range(len(stops)-1):
+            cur+=on[i]-off[i]
+            if cur > AIRCRAFT[trip["atype"]]["seats"]: return False, None, None
+        return True, pi, di
+    # 紧窗优先、production 次之、shift 最后；同级按窗口从紧到松，优先塞入最难安排者
+    unserved_nt = [p for p in (all_req if 'all_req' in dir() else people)
+                   if p["task_type"] != "temporary" and p["person_id"] not in served_set]
+    prio = {"emergency":0, "production":1, "shift":2}
+    unserved_nt.sort(key=lambda p: (prio.get(p["task_type"], 3),
+                                    to_min(datetime.strptime(p["latest_arrival_time"], FMT))
+                                    - to_min(datetime.strptime(p["earliest_pickup_time"], FMT))))
+    for p in unserved_nt:
+        for trip in all_trips:
+            ok, pi, di = can_join_free(trip, p)
+            if ok:
+                trip["pax"].append((p["person_id"], pi, di, p))
+                free_joined += 1
+                served_set.add(p["person_id"])
+                break
+    if free_joined:
+        print(f"阶段C(空位补客): 整合后把 {free_joined} 名未排非临时需求塞入已有架次空位（0 额外时间）")
     T_total = trips_total_air_time(all_trips, D)
     temp_time = T_total - trips_total_air_time(trips, D)
     temp_served = sum(1 for p in temp if any(pid == p["person_id"] for t in all_trips for pid, _, _, _ in t["pax"]))
