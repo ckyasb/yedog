@@ -424,7 +424,7 @@ def main():
         # (1+delta)^(1/eps) >= 0.88 -> delta <= 0.88^eps - 1
         delta_upper = min(hi, 0.88 ** eps - 1) if eps != 0 else hi
         # 网格搜索 delta（细粒度）
-        grid = np.linspace(lo, max(lo, delta_upper), 30)
+        grid = np.linspace(lo, max(lo, delta_upper), 50)
         best = None
         for d in grid:
             dec = (1, 1, t_lvl, d)  # b/s 占位，单场 TV/BV 不依赖 b/s? TV 依赖 delta, BV 依赖 b_pri
@@ -447,7 +447,7 @@ def main():
         dinc = drl_row["max_ticket_increase_rate"]; ddisc = drl_row["max_ticket_discount_rate"]
         eps = tb_map.loc["Group_Match_R3", "price_elasticity"]
         delta_upper = min(dinc, 0.88 ** eps - 1) if eps != 0 else dinc
-        delta_grid = np.linspace(-ddisc, max(-ddisc, delta_upper), 30)
+        delta_grid = np.linspace(-ddisc, max(-ddisc, delta_upper), 50)
         cand_list = []
         for (b, s, t) in cands:
             for d in delta_grid:
