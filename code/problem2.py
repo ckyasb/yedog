@@ -18,17 +18,27 @@ df1 = df1[np.isfinite(df1["life"])].reset_index(drop=True)
 # 派生 SOC 区间高倍率暴露量
 df1["E_low"] = df1["C1"] * df1["Q1"]            # 低/中 SOC 段高倍率暴露 = C1 * Q1宽
 df1["E_high"] = df1["C2"] * (80 - df1["Q1"])    # 中高 SOC 段高倍率暴露 = C2 * (80-Q1)宽
+df1["is_new"] = df1["policy"].str.contains("NEWSTRUCTURE").astype(int)
+
+# 使用分段稳态寿命（前50循环与50循环后分段斜率加权外推）作为因变量
+# 稳态斜率比整体斜率更能代表长期衰减趋势
+df_pw = pd.read_csv(os.path.join(RESULTS_DIR, "p1_piecewise_life.csv"))
+df_pw = df_pw[["battery_id", "life_late"]].rename(columns={"life_late": "life_steady"})
+df1 = df1.merge(df_pw, on="battery_id", how="left")
+# 若分段寿命缺失则用原始寿命
+df1["life_steady"] = df1["life_steady"].fillna(df1["life"])
+
 df1.to_csv(os.path.join(RESULTS_DIR, "p2_features.csv"), index=False)
 
 # ============ (1) 策略间寿命差异显著性 ============
 policies = sorted(df1["policy"].unique())
-groups = [df1[df1["policy"] == p]["life"].values for p in policies]
+groups = [df1[df1["policy"] == p]["life_steady"].values for p in policies]
 
 # Kruskal-Wallis
 H_stat, p_kw = stats.kruskal(*groups)
 # 置换检验（10000次）：在 H0 下随机重排策略标签，看 H 统计量超过观测的比例
 rng = np.random.RandomState(SEED)
-life_arr = df1["life"].to_numpy()
+life_arr = df1["life_steady"].to_numpy()
 pol_codes = df1["policy"].astype("category").cat.codes.to_numpy()
 obs_H = H_stat
 n_perm = 10000
@@ -66,10 +76,10 @@ print(f"Kruskal-Wallis H={H_stat:.3f}, p={p_kw:.4g}; 置换p={p_perm:.4f}; ANOVA
 
 # ============ (2) C1/Q1/C2 与寿命关系 + (3) 影响程度 ============
 # 岭回归含交互（多重共线性）：life ~ C1 + Q1 + C2 + C1:Q1 + C2:Q1
-X = df1[["C1", "Q1", "C2"]].copy()
+X = df1[["C1", "Q1", "C2", "is_new"]].copy()
 X["C1_Q1"] = df1["C1"] * df1["Q1"]
 X["C2_Q1"] = df1["C2"] * df1["Q1"]
-y = np.log(df1["life"].values)  # log 寿命，稳定尺度
+y = np.log(df1["life_steady"].values)  # log 稳态寿命（分段拟合）
 scaler = StandardScaler()
 Xs = scaler.fit_transform(X)
 ridge = Ridge(alpha=1.0)
@@ -94,10 +104,10 @@ for v, ctrl in [("C1", ["Q1", "C2"]), ("Q1", ["C1", "C2"]), ("C2", ["C1", "Q1"])
 
 # 随机森林置换重要性（非参数影响程度）
 rf = RandomForestRegressor(n_estimators=500, random_state=SEED)
-Xrf = df1[["C1", "Q1", "C2"]].to_numpy()
+Xrf = df1[["C1", "Q1", "C2", "is_new"]].to_numpy()
 rf.fit(Xrf, y)
 perm_imp = permutation_importance(rf, Xrf, y, n_repeats=30, random_state=SEED)
-imp = {k: float(np.mean(perm_imp.importances[i])) for i, k in enumerate(["C1", "Q1", "C2"])}
+imp = {k: float(np.mean(perm_imp.importances[i])) for i, k in enumerate(["C1", "Q1", "C2", "is_new"])}
 # 归一化为百分比
 imp_pct = {k: v / sum(imp.values()) * 100 for k, v in imp.items()}
 
@@ -143,7 +153,7 @@ print(f"Pearson: E_low vs |slope| r={r_low:.3f}(p={p_low:.3f}); E_high vs |slope
 # 图6: 分组箱线图 + KW 显著性标注
 fig, ax = plt.subplots(figsize=(9, 5))
 order = df1.groupby("policy")["life"].median().sort_values(ascending=False).index.tolist()
-data = [df1[df1["policy"] == p]["life"].values for p in order]
+data = [df1[df1["policy"] == p]["life_steady"].values for p in order]
 bp = ax.boxplot(data, vert=True, patch_artist=True, showmeans=True,
                 meanprops=dict(marker="D", mfc="white", mec="k", ms=5))
 for i, patch in enumerate(bp["boxes"]):
@@ -158,7 +168,7 @@ fig, axes = plt.subplots(1, 3, figsize=(11, 3.6))
 for ax, col, lab in zip(axes, ["C1", "Q1", "C2"], ["C1 (C)", "Q1 (%)", "C2 (C)"]):
     for i, p in enumerate(policies):
         sub = df1[df1["policy"] == p]
-        ax.scatter(sub[col], sub["life"], color=PALETTE[i % len(PALETTE)],
+        ax.scatter(sub[col], sub["life_steady"], color=PALETTE[i % len(PALETTE)],
                    s=40, edgecolor="white", lw=0.5, alpha=0.85)
     ax.set_xlabel(lab); ax.set_ylabel("循环寿命"); ax.set_yscale("log")
     # 偏相关标注
@@ -169,7 +179,7 @@ plt.tight_layout(); plt.savefig(fig_path("p2_param_partial.pdf")); plt.close()
 
 # 图8: 影响程度条形（随机森林置换重要性 %）
 fig, ax = plt.subplots(figsize=(6, 3.8))
-keys = ["C1", "Q1", "C2"]
+keys = ["C1", "Q1", "C2", "is_new"]
 vals = [imp_pct[k] for k in keys]
 bars = ax.bar(keys, vals, color=PALETTE[:3], alpha=0.8, edgecolor="white")
 ax.set_ylabel("对寿命方差解释占比 (%)")

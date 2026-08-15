@@ -108,6 +108,42 @@ plt.tight_layout()
 plt.savefig(fig_path("p4_bayes_opt_pareto.pdf"))
 plt.close()
 
+# Weight sensitivity plot (matches paper @fig:wtsens)
+fig, ax = plt.subplots(figsize=(8, 5))
+wts = [s["w_t"] for s in sens]
+c1s = [s["C1"] for s in sens]
+q1s = [s["Q1"] for s in sens]
+c2s = [s["C2"] for s in sens]
+ax.plot(wts, c1s, "o-", label="$C_1$", color=PALETTE[0])
+ax.plot(wts, q1s, "s-", label="$Q_1$", color=PALETTE[1])
+ax.plot(wts, c2s, "^-", label="$C_2$", color=PALETTE[2])
+ax.axvspan(0.3, 0.6, alpha=0.12, color="gold", label="推荐稳定区")
+ax.set_xlabel("充电时间权重 $w_t$")
+ax.set_ylabel("最优策略参数")
+ax.legend(fontsize=8, loc="best")
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(fig_path("p4_weight_sens.pdf"))
+plt.close()
+
+# Score rank plot (matches paper @fig:scorerank) - 9 strategies weighted score
+df_strat = pd.read_csv(os.path.join(RESULTS_DIR, "p4_strategies.csv"))
+# Compute weighted score (w_t=0.5) from normalized t_ch and |slope|
+t_min_s, t_max_s = df_strat["t_ch_model"].min(), df_strat["t_ch_model"].max()
+s_min_s, s_max_s = df_strat["slope_model"].abs().min(), df_strat["slope_model"].abs().max()
+df_strat["t_norm"] = (df_strat["t_ch_model"] - t_min_s) / (t_max_s - t_min_s)
+df_strat["s_norm"] = (df_strat["slope_model"].abs() - s_min_s) / (s_max_s - s_min_s)
+df_strat["score"] = df_strat["t_norm"] * 0.5 + df_strat["s_norm"] * 0.5
+df_strat = df_strat.sort_values("score").reset_index(drop=True)
+df_strat.to_csv(os.path.join(RESULTS_DIR, "p4_score_rank.csv"), index=False)
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.barh(df_strat["policy"], df_strat["score"], color=PALETTE[0], alpha=0.8)
+ax.set_xlabel("加权综合得分（越小越优）")
+ax.invert_yaxis()
+plt.tight_layout()
+plt.savefig(fig_path("p4_score_rank.pdf"))
+plt.close()
+
 print(f"=== P4 贝叶斯优化(随机搜索5000点) ===")
 print(f"Pareto点数: {len(pareto)}")
 print(f"推荐: C1={best['C1']:.2f} Q1={best['Q1']:.1f} C2={best['C2']:.2f}")
