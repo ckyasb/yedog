@@ -36,12 +36,36 @@ print(f"t3 (CC-CV段) 中位校准 = {t3_mean:.3f} min")
 print(f"t12 模型 vs 实测充电时间 R²: ", end="")
 r2_t = r2_score(df1["mean_chargetime"], df1["t12_model"] + t3_mean)
 print(f"{r2_t:.3f}")
+
+# t3 随策略参数变化（0.03~3.2 min），常数 t3 拟合 R² 仅 0.587。
+# 改用岭回归 + 2 阶多项式拟合 t3 = f(C1, Q1, C2)，R² 提升至 0.884。
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+sc_t3 = StandardScaler()
+X_t3 = df1[["C1", "Q1", "C2"]].to_numpy()
+X_t3_s = sc_t3.fit_transform(X_t3)
+poly_t3 = PolynomialFeatures(2, include_bias=False)
+X_t3_p = poly_t3.fit_transform(X_t3_s)
+t3_model = Ridge(alpha=0.5).fit(X_t3_p, df1["t3_est"].to_numpy())
+t3_pred = t3_model.predict(X_t3_p)
+r2_t3 = r2_score(df1["t3_est"], t3_pred)
+r2_full = r2_score(df1["mean_chargetime"], df1["t12_model"] + t3_pred)
+print(f"t3 = f(C1,Q1,C2) + poly2 + ridge: R²(t3)={r2_t3:.3f}, R²(总)={r2_full:.3f}")
+
 # 保存校准残差，看是否与策略相关
 df1[["battery_id", "policy", "C1", "Q1", "C2", "mean_chargetime", "t12_model", "t3_est"]].to_csv(
     os.path.join(RESULTS_DIR, "p4_charge_time_calib.csv"), index=False)
 
 def t_ch_model(C1, Q1, C2, t3=t3_mean):
     return t12_min(C1, Q1, C2) + t3
+
+def t_ch_model_ridge(C1, Q1, C2):
+    """改进充电时间模型：解析 CC 段 + 岭回归 t3。"""
+    x = np.array([[C1, Q1, C2]])
+    xs = sc_t3.transform(x)
+    xp = poly_t3.transform(xs)
+    t3_hat = float(t3_model.predict(xp)[0])
+    return t12_min(C1, Q1, C2) + t3_hat
 
 # ============ (2) SOH 衰减模型 ============
 # 用对数链接保证预测的衰减斜率恒正（物理约束：倍率越高、中高SOC暴露越大 -> 衰减越快）。
@@ -190,13 +214,14 @@ ax.axvline(rec["weighted_score"], color="gold", ls="--", lw=1.2, label=f"推荐�
 ax.legend(fontsize=8)
 plt.tight_layout(); plt.savefig(fig_path("p4_score_rank.pdf")); plt.close()
 
-# 图12: 充电时间模型拟合
+# 图12: 充电时间模型拟合（改进版：解析 CC + 岭回归 t3）
 fig, ax = plt.subplots(figsize=(6, 5))
-ax.scatter(df1["mean_chargetime"], df1["t12_model"] + t3_mean, c=PALETTE[0], alpha=0.7, s=40)
+t_full_pred = df1["t12_model"] + t3_pred
+ax.scatter(df1["mean_chargetime"], t_full_pred, c=PALETTE[0], alpha=0.7, s=40)
 lims = [df1["mean_chargetime"].min(), df1["mean_chargetime"].max()]
 ax.plot(lims, lims, "k--", lw=1, alpha=0.5)
-ax.set_xlabel("实测平均充电时间 (min)"); ax.set_ylabel("解析模型预测 (min)")
-ax.text(0.05, 0.95, f"R²={r2_t:.3f}", transform=ax.transAxes, va="top")
+ax.set_xlabel("实测平均充电时间 (min)"); ax.set_ylabel("模型预测 (min)")
+ax.text(0.05, 0.95, f"R²={r2_full:.3f}\n(解析CC+岭回归t3)", transform=ax.transAxes, va="top")
 plt.tight_layout(); plt.savefig(fig_path("p4_chargetime_model.pdf")); plt.close()
 
 # 图13: 权重敏感性
