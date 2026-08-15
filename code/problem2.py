@@ -127,27 +127,75 @@ print(f"随机森林 R²={rf.score(Xrf,y):.3f}, 置换重要性占比: {imp_pct}
 
 # ============ (4) SOC 区间高倍率衰减特征 ============
 # 比较两组：高 E_high（中高SOC高倍率）vs 高 E_low（低SOC高倍率），看衰减斜率 |slope|
-# 用斜率绝对值对 E_low, E_high 做回归
-from sklearn.linear_model import LinearRegression
+# 衰减斜率分布跨数量级（NEWSTRUCTURE 短寿命电池斜率比长寿命大 1-2 个数量级），
+# 直接线性拟合 R² 仅 0.08；改用 log 空间 + 交互项/比值项拟合，更符合衰减的乘性结构。
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 sl = np.abs(df1["slope_SOH"].values)  # 衰减速率（越大越快）
+sl_log = np.log(np.clip(sl, 1e-12, None))  # log |slope|，压缩跨数量级的方差
+
+# 基线：线性 |k| ~ E_low + E_high（保留作对照）
 El = df1[["E_low", "E_high"]].to_numpy()
 lr = LinearRegression().fit(El, sl)
-sl_pred = lr.predict(El)
 r2_sl = lr.score(El, sl)
-# 单独相关
+
+# 改进1：log |k| ~ E_low + E_high（线性，log 空间）
+lr_log = LinearRegression().fit(El, sl_log)
+r2_sl_log = lr_log.score(El, sl_log)
+
+# 改进2：log |k| ~ E_low + E_high + sqrt(E_high) + 交互 + is_new
+#         中高 SOC 段暴露对衰减可能是亚线性的（析锂阈值效应），加入 sqrt 项
+#         NEWSTRUCTURE 是该关系的重要混杂（同参数下寿命差 5 倍），显式纳入
+E_low = df1["E_low"].to_numpy()
+E_high = df1["E_high"].to_numpy()
+is_new_arr = df1["is_new"].to_numpy()
+E_high_safe = np.sqrt(np.clip(E_high, 0, None))  # sqrt(E_high), E_high>=0
+X_nl = np.column_stack([E_low, E_high, E_high_safe, E_low * E_high, is_new_arr])
+scaler_nl = StandardScaler().fit(X_nl)
+X_nl_s = scaler_nl.transform(X_nl)
+ridge_nl = Ridge(alpha=1.0).fit(X_nl_s, sl_log)
+r2_nl = ridge_nl.score(X_nl_s, sl_log)
+
+# 选最优模型
+best_name = max([("linear", r2_sl), ("log_linear", r2_sl_log), ("log_nonlinear", r2_nl)], key=lambda t: t[1])[0]
+best_r2 = max(r2_sl, r2_sl_log, r2_nl)
+
+# 单独相关（仍用原始 |k|，便于和物理直觉对照）
 r_low, p_low = stats.pearsonr(df1["E_low"], sl)
 r_high, p_high = stats.pearsonr(df1["E_high"], sl)
+# log 空间偏相关（控制 E_low 看 E_high 的净效应，反之亦然）
+from sklearn.linear_model import LinearRegression
+def partial_log(target, var, controls):
+    Z = np.column_stack(controls)
+    rt = sl_log - LinearRegression().fit(Z, sl_log).predict(Z)
+    rv = df1[var].to_numpy() - LinearRegression().fit(Z, df1[var].to_numpy()).predict(Z)
+    r, p = stats.pearsonr(rt, rv)
+    return float(r), float(p)
+pr_low, pp_low = partial_log(sl_log, "E_low", [E_high])
+pr_high, pp_high = partial_log(sl_log, "E_high", [E_low])
+
 soc_result = {
-    "decay_vs_E_r2": float(r2_sl),
+    "decay_vs_E_r2": float(r2_sl),           # 基线线性 R²（保留，论文需引用）
+    "decay_vs_E_r2_log": float(r2_sl_log),   # log 线性 R²
+    "decay_vs_E_r2_log_nonlinear": float(r2_nl),  # log 非线性 R²
+    "best_model": best_name,
+    "best_r2": float(best_r2),
     "coefs": {"E_low": float(lr.coef_[0]), "E_high": float(lr.coef_[1]),
               "intercept": float(lr.intercept_)},
+    "log_coefs": {"E_low": float(lr_log.coef_[0]), "E_high": float(lr_log.coef_[1]),
+                  "intercept": float(lr_log.intercept_)},
     "pearson_E_low_vs_slope": {"r": float(r_low), "p": float(p_low)},
     "pearson_E_high_vs_slope": {"r": float(r_high), "p": float(p_high)},
+    "partial_log_E_low": {"r": float(pr_low), "p": float(pp_low)},
+    "partial_log_E_high": {"r": float(pr_high), "p": float(pp_high)},
 }
 save_json(soc_result, "p2_soc_interval.json")
 print("\n=== (4) SOC区间高倍率衰减特征 ===")
-print(f"|斜率| ~ E_low+E_high: R²={r2_sl:.3f}, coef E_low={lr.coef_[0]:.2e}, E_high={lr.coef_[1]:.2e}")
-print(f"Pearson: E_low vs |slope| r={r_low:.3f}(p={p_low:.3f}); E_high vs |slope| r={r_high:.3f}(p={p_high:.3f})")
+print(f"|k| ~ E_low+E_high (线性): R²={r2_sl:.3f}")
+print(f"log|k| ~ E_low+E_high: R²={r2_sl_log:.3f}")
+print(f"log|k| ~ E_low+E_high+sqrt(E_high)+交互: R²={r2_nl:.3f}  <- 最优={best_name}")
+print(f"Pearson(原|k|): E_low r={r_low:.3f}(p={r_low:.3f}); E_high r={r_high:.3f}(p={p_high:.3f})")
+print(f"偏相关(log|k|,控制对方): E_low r={pr_low:.3f}(p={pp_low:.4f}); E_high r={pr_high:.3f}(p={pp_high:.4f})")
 
 # ============ 图 ============
 # 图6: 分组箱线图 + KW 显著性标注
