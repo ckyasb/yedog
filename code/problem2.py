@@ -793,7 +793,7 @@ def main():
     G = precompute_globals(gm, venues, slots, tb, bp, sec, dist, p1, drl)
 
     # 多起点贪心+SA
-    n_starts = 6
+    n_starts = 8
     best_Z = -1e18; best_v = None; best_s = None; hist = []
     best_any = None  # (viol, Z, v, s) 备选
     for k in range(n_starts):
@@ -823,7 +823,7 @@ def main():
     if best_v is not None:
         v2, s2, Z2_ws = simulated_annealing(G, best_v, best_s,
                                              np.random.default_rng(utils.SEED + 999),
-                                             iters=8000, T0=0.01, Tend=1e-7, hard_penalty=50)
+                                             iters=10000, T0=0.01, Tend=1e-7, hard_penalty=50)
         viol_ws = check_constraints(G, v2, s2)
         if viol_ws["total_violations"] == 0 and Z2_ws > best_Z:
             best_v, best_s, best_Z = v2, s2, Z2_ws
