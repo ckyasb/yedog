@@ -575,7 +575,11 @@ def simulated_annealing(G, venue_of, slot_of, rng, iters=8000, T0=0.05, Tend=1e-
     Z2, _, _ = objective_terms(G, venue_of, slot_of)
     cur_viol = viol0["total_violations"]
     cur_obj = Z2 - hard_penalty * cur_viol
-    best_obj = cur_obj; best_Z = Z2; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = cur_viol
+    # best_* tracks the best ZERO-VIOLATION solution found (or initial if none)
+    if cur_viol == 0:
+        best_obj = cur_obj; best_Z = Z2; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = 0
+    else:
+        best_obj = -1e18; best_Z = -1e18; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = cur_viol
     # 预计算 (v,s) 占用集合加速
     T = T0
     for it in range(iters):
@@ -621,12 +625,17 @@ def simulated_annealing(G, venue_of, slot_of, rng, iters=8000, T0=0.05, Tend=1e-
             cur_obj = new_obj; Z2 = Z2_new; cur_viol = new_viol
             if cur_viol == 0 and Z2 > best_Z:
                 best_Z = Z2; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = 0
-            elif new_obj > best_obj:
-                best_obj = new_obj; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = new_viol
+                best_obj = cur_obj
+            elif new_viol == 0 and new_obj > best_obj:
+                best_obj = new_obj; best_v = venue_of.copy(); best_s = slot_of.copy(); best_viol = 0
         else:
             venue_of[m], slot_of[m] = old_v, old_s
             if m2 is not None:
                 venue_of[m2], slot_of[m2] = new_v, new_s
+    # 若从未找到零违反解，返回最终状态（least-violation 的近似）
+    if best_Z <= -1e17:
+        best_v = venue_of.copy(); best_s = slot_of.copy()
+        best_Z, _, _ = objective_terms(G, best_v, best_s)
     return best_v, best_s, best_Z
 
 
@@ -792,8 +801,8 @@ def main():
         v0, s0 = greedy_init(G, rng_k)
         viol = check_constraints(G, v0, s0)
         Z0, _, _ = objective_terms(G, v0, s0)
-        v1, s1, Z1 = simulated_annealing(G, v0, s0, rng_k, iters=4000)
-        v1, s1, Z1 = simulated_annealing(G, v1, s1, np.random.default_rng(utils.SEED + k + 100), iters=4000)
+        v1, s1, Z1 = simulated_annealing(G, v0, s0, rng_k, iters=6000, T0=0.05, Tend=1e-5, hard_penalty=50)
+        v1, s1, Z1 = simulated_annealing(G, v1, s1, np.random.default_rng(utils.SEED + k + 100), iters=6000, T0=0.02, Tend=1e-6, hard_penalty=50)
         viol1 = check_constraints(G, v1, s1)
         print(f"start{k}: init Z={Z0:.4f} viol={viol['total_violations']} -> SA Z={Z1:.4f} viol={viol1['total_violations']}")
         hist.append({"start": k, "Z_init": float(Z0), "Z_sa": float(Z1), "viol_init": viol["total_violations"], "viol_sa": viol1["total_violations"]})
@@ -809,6 +818,18 @@ def main():
         best_v, best_s, best_Z = repair(G, best_v, best_s)
         viol_fix = check_constraints(G, best_v, best_s)
         print(f"修复后 viol={viol_fix['total_violations']} Z={best_Z:.4f}")
+
+    # warm-start SA：从最优解出发再跑一轮精修
+    if best_v is not None:
+        v2, s2, Z2_ws = simulated_annealing(G, best_v, best_s,
+                                             np.random.default_rng(utils.SEED + 999),
+                                             iters=8000, T0=0.01, Tend=1e-7, hard_penalty=50)
+        viol_ws = check_constraints(G, v2, s2)
+        if viol_ws["total_violations"] == 0 and Z2_ws > best_Z:
+            best_v, best_s, best_Z = v2, s2, Z2_ws
+            print(f"warm-start 精修: Z2 {best_Z:.6f} (viol=0)")
+        else:
+            print(f"warm-start 未改善 (Z2={Z2_ws:.4f} viol={viol_ws['total_violations']})")
 
     # 最终约束检查
     viol_final = check_constraints(G, best_v, best_s)
