@@ -1,7 +1,13 @@
-#let body-font = ("Times New Roman", "SimSun", "NSimSun", "Songti SC", "STSong")
-#let song-font = ("SimSun", "NSimSun", "Songti SC", "STSong", "Times New Roman")
-#let hei-font = ("Heiti SC", "STHeiti", "Noto Sans CJK SC", "Songti SC", "STSong")
-#let kai-font = ("KaiTi", "Kaiti SC", "STKaiti", "SimSun", "Songti SC")
+// 字体定义：仅使用本机已装字体，消除 Typst unknown-font 警告。
+// PDF 编译时内嵌字体子集，故在任意环境打开均一致（策联杯规范"字号字体行距颜色不统一要求"）。
+// 正文西文：Nimbus Roman（Times New Roman 的度量兼容替代，URW 公开字体）。
+// 正文中文：Noto Serif CJK SC（宋体风格，Adobe/Google 开源字体）。
+// 黑体（标题）：Noto Sans CJK SC（黑体风格）。
+// 楷体：AR PL KaitiM GB（开源楷体）。
+#let body-font = ("Nimbus Roman", "Noto Serif CJK SC")
+#let song-font = ("Noto Serif CJK SC", "Nimbus Roman")
+#let hei-font = ("Noto Sans CJK SC", "Noto Serif CJK SC")
+#let kai-font = ("AR PL KaitiM GB", "Noto Serif CJK SC")
 
 #let cn-numbering(..nums) = {
   let ns = nums.pos()
@@ -38,7 +44,7 @@
 #show heading.where(level: 3): set text(size: 12.05pt, weight: "bold")
 #show heading.where(level: 3): set block(above: 1.15em, below: 0.55em)
 #show figure.caption: it => text(size: 12pt, weight: "bold")[#it]
-#show raw: set text(size: 10pt, font: ("Courier New", "Menlo", "SimSun", "Songti SC"))
+#show raw: set text(size: 10pt, font: ("Noto Sans Mono", "Nimbus Mono PS"))
 #show raw.where(block: true): set block(
   fill: luma(97%),
   stroke: 0.8pt + luma(70%),
@@ -91,7 +97,7 @@
 
   对于问题二（4000 条出海、海返与穿梭联合需求），以设施为中心构造往返环，实现出海与海返的座位动态复用，并嵌入穿梭人员。求得总飞机使用时间 28602 min（476.7 h），167 架次，座位利用率 0.5591，gap 为 5.3%，架次数与下界一致。
 
-  对于问题三（4000 条带时间窗与任务类型的多日排班，24 架飞机配额），采用两阶段策略：阶段 A 排非临时 3840 条得总飞机使用时间 $T_0$=53358 min，阶段 B 将 160 条临时任务以零额外时间插入现有架次，阶段 C 空位补客将未排需求塞入已有架次空位，阶段 D 机型换型将 10 个 T3 架次降为 T2。最终总飞机使用时间 53193 min，临时任务满足 159/160（98.1%），非临时服务 3713/3840（96.7%）。所有结果均经独立校验，续航、时刻链、运营窗与周转约束全部满足。
+  对于问题三（4000 条带时间窗与任务类型的多日排班，24 架飞机配额），采用两阶段策略：阶段 A 排非临时 3840 条得总飞机使用时间 $T_0$=53358 min，阶段 B 将 160 条临时任务以零额外时间插入现有架次，阶段 C 空位补客将未排需求塞入已有架次空位，阶段 D 机型换型将 10 个 T3 架次降为 T2，阶段 E 停靠序约束 TSP 重排 23 个架次。最终总飞机使用时间 52895 min，临时任务满足 159/160（98.1%），非临时服务 3713/3840（96.7%）。所有结果均经独立校验，续航、时刻链、运营窗与周转约束全部满足。
 ][
   直升机运载 #h(1em) 车辆路径问题 #h(1em) 续航约束 #h(1em) 大邻域搜索 #h(1em) 座位动态复用
 ]
