@@ -1,7 +1,7 @@
-#let body-font = ("Times New Roman", "SimSun", "NSimSun", "Songti SC", "STSong")
-#let song-font = ("SimSun", "NSimSun", "Songti SC", "STSong", "Times New Roman")
-#let hei-font = ("Heiti SC", "STHeiti", "Songti SC", "STSong")
-#let kai-font = ("KaiTi", "Kaiti SC", "STKaiti", "SimSun", "Songti SC")
+#let body-font = ("Noto Sans CJK SC", "Noto Serif CJK SC", "DejaVu Sans")
+#let song-font = ("Noto Serif CJK SC", "Noto Sans CJK SC")
+#let hei-font = ("Noto Sans CJK SC", "Noto Sans CJK JP")
+#let kai-font = ("Noto Serif CJK SC", "Noto Sans CJK SC")
 
 #let cn-numbering(..nums) = {
   let ns = nums.pos()
@@ -38,7 +38,7 @@
 #show heading.where(level: 3): set text(size: 12.05pt, weight: "bold")
 #show heading.where(level: 3): set block(above: 1.15em, below: 0.55em)
 #show figure.caption: it => text(size: 12pt, weight: "bold")[#it]
-#show raw: set text(size: 10pt, font: ("Courier New", "Menlo", "SimSun", "Songti SC"))
+#show raw: set text(size: 10pt, font: ("Noto Sans Mono CJK HK", "Noto Sans CJK SC", "DejaVu Sans Mono"))
 #show raw.where(block: true): set block(
   fill: luma(97%),
   stroke: 0.8pt + luma(70%),
@@ -154,11 +154,11 @@
 
 
 #pagebreak()
-#references-cn()
-#pagebreak()
 #heading(numbering: none, outlined: true)[AI 工具使用声明]
 
 本参赛队在竞赛过程中使用了 AI 工具，主要用于语言润色、代码调试与论文排版辅助，详细使用情况见支撑材料。
 
+#pagebreak()
+#references-cn()
 #pagebreak()
 #appendix-cn()

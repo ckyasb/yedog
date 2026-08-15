@@ -2,7 +2,7 @@
 
 #pagebreak()
 #align(center)[#text(
-  font: ("Heiti SC", "STHeiti", "SimSun", "Songti SC"),
+  font: ("Noto Sans CJK SC", "Noto Sans CJK JP"),
   size: 12pt,
 )[表 1 #h(1em) 主要符号说明]]
 #align(center)[

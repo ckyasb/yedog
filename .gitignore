@@ -1,0 +1,11 @@
+# Temporary PDF page renders and text extracts
+_tmp/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
