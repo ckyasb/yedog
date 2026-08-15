@@ -14,7 +14,12 @@ df1 = df1[np.isfinite(df1["life"])].reset_index(drop=True)
 df1["E_low"] = df1["C1"] * df1["Q1"]
 df1["E_high"] = df1["C2"] * (80 - df1["Q1"])
 df1["is_new"] = df1["policy"].str.contains("NEWSTRUCTURE").astype(int)
-y_dec = np.abs(df1["slope_SOH"].to_numpy())
+# 使用分段稳态斜率(slope_late)而非整体斜率，与P1/P2方法论一致
+df_pw = pd.read_csv(os.path.join(RESULTS_DIR, "p1_piecewise_life.csv"))
+df_pw = df_pw[["battery_id", "slope_late"]].rename(columns={"slope_late": "slope_steady"})
+df1 = df1.merge(df_pw, on="battery_id", how="left")
+df1["slope_steady"] = df1["slope_steady"].fillna(df1["slope_SOH"])
+y_dec = np.abs(df1["slope_steady"].to_numpy())
 log_y = np.log(np.clip(y_dec, 1e-12, None))
 
 X = df1[["C1","Q1","C2","E_low","E_high","is_new","mean_Tavg","mean_IR"]].to_numpy()
