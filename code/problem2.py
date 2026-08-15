@@ -186,6 +186,54 @@ def refine(flights, people, D, rounds=20):
                     break
     return flights
 
+def reorder_tsp(flights, D):
+    """第三层优化：停靠序约束 TSP 重排。对含 ≥2 设施的架次，在满足 pickup-before-delivery
+    约束的所有排列中找最短距离序，若续航可行且不增飞机使用时间则采用。
+    Q1/Q2 无时间窗，故无需校验时刻链/运营窗；pax 索引重映射。
+    修复 tsp_order 只做纯距离 TSP 忽略 pickup-before-delivery 的缺陷。"""
+    from itertools import permutations
+    reordered = 0; save = 0
+    for f in flights:
+        stops = f.stops; airport = stops[0]; facs = stops[1:-1]
+        if len(facs) < 2:
+            continue
+        # pickup-before-delivery 约束
+        constraints = []
+        for pid, pi, di in f.pax:
+            if 0 < pi < len(stops)-1 and 0 < di < len(stops)-1 and pi < di:
+                constraints.append((stops[pi], stops[di]))
+        cur_d = sum(D[(stops[i], stops[i+1])] for i in range(len(stops)-1))
+        best = None  # (new_time, new_stops, rf)
+        for perm in permutations(facs):
+            pos = {fac: i for i, fac in enumerate(perm)}
+            if any(pos[pf] >= pos[df] for pf, df in constraints):
+                continue
+            new_stops = [airport] + list(perm) + [airport]
+            d = sum(D[(new_stops[i], new_stops[i+1])] for i in range(len(new_stops)-1))
+            if d >= cur_d:
+                continue
+            ok, rf = fuel_ok(new_stops, f.atype, D)
+            if not ok:
+                continue
+            new_t = flight_time_minutes(new_stops, f.atype, rf, D)
+            if new_t >= flight_time_minutes(stops, f.atype, f.refuels, D):
+                continue
+            if best is None or new_t < best[0]:
+                best = (new_t, new_stops, rf)
+        if best is not None:
+            new_t, new_stops, rf = best
+            old_t = flight_time_minutes(stops, f.atype, f.refuels, D)
+            # 重映射 pax 索引
+            new_idx = {fac: i for i, fac in enumerate(new_stops)}
+            new_pax = []
+            for pid, pi, di in f.pax:
+                npi = 0 if pi == 0 else new_idx[stops[pi]]
+                ndi = len(new_stops)-1 if di == len(stops)-1 else new_idx[stops[di]]
+                new_pax.append((pid, npi, ndi))
+            f.stops = new_stops; f.refuels = rf; f.pax = new_pax
+            reordered += 1; save += old_t - new_t
+    return flights, reordered, save
+
 def per_facility_lb(people, D):
     out, ret, shu = classify(people)
     out_by_dest = defaultdict(list)
@@ -233,6 +281,9 @@ def main():
 
     flights = build_round_trips(out, ret, shu, D)
     flights = refine(flights, people, D, rounds=20)
+    flights, reordered, reorder_save = reorder_tsp(flights, D)
+    if reordered:
+        print(f"停靠序重排: {reordered} 架次（时间-{reorder_save}min）")
     sol = Solution(flights=flights)
 
     # 校验

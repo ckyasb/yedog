@@ -1,14 +1,14 @@
 {
   "metrics": {
-    "total_air_time_min": 28602,
-    "total_pax_time_min": 259250,
+    "total_air_time_min": 28427,
+    "total_pax_time_min": 253195,
     "num_flights": 167,
-    "total_fuel_kg": 233175.4,
-    "seat_utilization": 0.5591
+    "total_fuel_kg": 231607.6,
+    "seat_utilization": 0.5512
   },
   "K_lb": 167,
   "T_lb_min": 27172,
-  "gap_pct": 5.26,
+  "gap_pct": 4.62,
   "seed": 20260803,
   "elapsed_s": 0.2
 }
