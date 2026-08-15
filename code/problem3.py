@@ -580,64 +580,92 @@ def main():
                 temp_served += 1
                 break
     # 第二优先：剩余 temp 新开架次（受 T<=T0 约束，用 plane_busy 检查可用性）
-    cur_total = trips_total_air_time(trips, D)
+    # 重建 plane_busy（来自 schedule_non_temp 的 trips，因 is_plane_free/plane_busy 是
+    # schedule_non_temp 的局部量，main 无法访问）。用区间冲突检测。
+    plane_busy = {aid: [] for aid, _, _ in FLEET}
+    for t in trips:
+        s = t["departures"][0]; e = t["arrivals"][-1] + TURNAROUND
+        plane_busy[t["aircraft_id"]].append((s, e))
+    def is_plane_free(aid, t_start, t_end):
+        for s, e in plane_busy[aid]:
+            if not (e <= t_start or s >= t_end):
+                return False
+        return True
+    # 预算基线：T0 是非临时基线（pre-consolidation）。后续 consolidate/swap/reorder 会
+    # 大幅降低非临时总时间（约 72792→52895）。题面 T<=T0 指最终总时间不超过 T0。
+    # 若用 raw 非临时总时间（=T0）作 cur_total，则 headroom=0，任何新开架次都超预算。
+    # 故先做一次预整合得到降低后的非临时总时间作为 cur_total，使预算反映真实余量。
+    # 预整合在副本上做，不修改 trips（temp pax 尚未加入，正式整合在后）。
+    _prov_trips = [dict(t) for t in trips]
+    for _t in _prov_trips: _t["pax"] = list(_t["pax"])
+    _prov_trips = consolidate_trips(_prov_trips, all_req if 'all_req' in dir() else people, D,
+                                    AIRCRAFT, AIRPORTS, FACILITIES, FMT, to_min, date_of, datetime)
+    cur_total = trips_total_air_time(_prov_trips, D)
     for p in temp:
         if any(pid == p["person_id"] for t in trips for pid, _, _, _ in t["pax"]):
             continue
         o, d = p["origin_id"], p["destination_id"]
         oL = (o=="LAND" or o in AIRPORTS); dL=(d=="LAND" or d in AIRPORTS)
+        # 确定候选机场集与 facs。穿梭(F->F)的 pickup/delivery 都是设施，索引会因
+        # make_route 插入加油点而偏移，须用 stops.index(o)/stops.index(d) 动态取；
+        # 且穿梭尝试所有机场（不止最近）以避开早高峰机位饱和。
         if oL and d in FACILITIES:
-            facs=[d]; a = nearest_airport(d, D); pio=0; dio=None
+            facs=[d]; airports_try=sorted(AIRPORTS, key=lambda a: D[(a, d)]); shuttle=False
         elif o in FACILITIES and dL:
-            facs=[o]; a = nearest_airport(o, D); pio=1; dio=None
+            facs=[o]; airports_try=sorted(AIRPORTS, key=lambda a: D[(a, o)]); shuttle=False
         elif o in FACILITIES and d in FACILITIES:
-            facs=[o,d]; a = nearest_airport(o, D); pio=1; dio=None
+            facs=[o,d]; airports_try=sorted(AIRPORTS, key=lambda a: D[(a, o)]); shuttle=True
         else:
             continue
         ep = to_min(datetime.strptime(p["earliest_pickup_time"], FMT))
         la = to_min(datetime.strptime(p["latest_arrival_time"], FMT))
         placed = False
-        for d_off in range(0, 8):
-            day = date_of(ep) + d_off
-            depart = max(ep, day*1440 + OP_START)
-            if depart > day*1440 + OP_END:
-                continue
-            for atype in ["T2","T1","T3"]:
-                res = plan_trip_timed(a, facs, atype, D, depart)
-                if res is None: continue
-                stops, refuels, arrs, deps = res
-                if o in FACILITIES and d in FACILITIES and stops.index(o) > stops.index(d): continue
-                pi = pio
-                di = len(stops)-1 if dio is None else stops.index(d)
-                if pi >= di: continue
-                if deps[pi] < ep: continue
-                if arrs[di] > la: continue
-                if date_of(arrs[-1]) != date_of(depart): continue
-                if arrs[-1] - date_of(depart)*1440 > RET_LIMIT: continue
-                ut = flight_time_minutes(stops, atype, refuels, D)
-                if cur_total + ut > T0:
+        for a in airports_try:
+            for d_off in range(0, 8):
+                day = date_of(ep) + d_off
+                depart = max(ep, day*1440 + OP_START)
+                if depart > day*1440 + OP_END:
                     continue
-                # 用 plane_busy 检查飞机可用性
-                trip_start = depart
-                trip_end = arrs[-1] + TURNAROUND
-                cands = [(aid, ap) for aid, ap, t3 in FLEET if ap == a and t3 == atype]
-                aid_chosen = None
-                for aid2, _ in cands:
-                    if is_plane_free(aid2, trip_start, trip_end):
-                        aid_chosen = aid2
-                        break
-                if aid_chosen is None:
-                    continue
-                plane_busy[aid_chosen].append((trip_start, trip_end))
-                pax = [(p["person_id"], pi, di, p)]
-                temp_trips.append(dict(aircraft_id=aid_chosen, airport=a, atype=atype, stops=stops,
-                                       refuels=refuels, arrivals=arrs, departures=deps, pax=pax))
-                temp_served += 1
-                cur_total += ut
-                placed = True
-                break
+                for atype in ["T2","T1","T3"]:
+                    res = plan_trip_timed(a, facs, atype, D, depart)
+                    if res is None: continue
+                    stops, refuels, arrs, deps = res
+                    if o in FACILITIES and d in FACILITIES and stops.index(o) > stops.index(d): continue
+                    # 动态取 pickup/delivery 索引（修正穿梭 pi/dio 硬编码 bug）
+                    if shuttle:
+                        pi = stops.index(o); di = stops.index(d)
+                    else:
+                        pi = 0 if oL else stops.index(o)
+                        di = len(stops)-1 if dL else stops.index(d)
+                    if pi >= di: continue
+                    if deps[pi] < ep: continue
+                    if arrs[di] > la: continue
+                    if date_of(arrs[-1]) != date_of(depart): continue
+                    if arrs[-1] - date_of(depart)*1440 > RET_LIMIT: continue
+                    ut = flight_time_minutes(stops, atype, refuels, D)
+                    if cur_total + ut > T0:
+                        continue
+                    # 用 plane_busy 检查飞机可用性
+                    trip_start = depart
+                    trip_end = arrs[-1] + TURNAROUND
+                    cands = [(aid, ap) for aid, ap, t3 in FLEET if ap == a and t3 == atype]
+                    aid_chosen = None
+                    for aid2, _ in cands:
+                        if is_plane_free(aid2, trip_start, trip_end):
+                            aid_chosen = aid2
+                            break
+                    if aid_chosen is None:
+                        continue
+                    plane_busy[aid_chosen].append((trip_start, trip_end))
+                    pax = [(p["person_id"], pi, di, p)]
+                    temp_trips.append(dict(aircraft_id=aid_chosen, airport=a, atype=atype, stops=stops,
+                                           refuels=refuels, arrivals=arrs, departures=deps, pax=pax))
+                    temp_served += 1
+                    cur_total += ut
+                    placed = True
+                    break
+                if placed: break
             if placed: break
-        if placed: break
     all_trips = trips + temp_trips
     # === 后置整合：在 temp 插入后执行架次整合（含 temp 人员）===
     all_trips = consolidate_trips(all_trips, all_req if 'all_req' in dir() else people, D,
