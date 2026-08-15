@@ -718,189 +718,195 @@ def main():
                 break
     if free_joined:
         print(f"阶段C(空位补客): 整合后把 {free_joined} 名未排非临时需求塞入已有架次空位（0 额外时间）")
-    # === 阶段D：机型换型（T3→T2 降型）。对每个 T3 架次，若 T2 续航可行、峰值座位≤16、
-    # 时间不增（T2 更快，且不引入额外加油 dwell）、pax 时间窗兼容、且同机场有 T2 飞机在该
-    # 区间空闲，则换型。T2 比 T3 更快（220 vs 190 km/h）且更省油（2.5 vs 2.9 kg/km），
-    # 因此 T3→T2 是对总飞机使用时间（主目标）与总燃油（次目标）的双赢。
-    # 只做 T3→T2（不做 T2→T1：T1 虽更快但更费油，会牺牲燃油次目标）。
-    swapped = 0
-    swap_time_save = 0
-    swap_fuel_save = 0.0
-    # 构建飞机忙区间表（区间冲突检测），用于换型时查 T2 飞机可用性
-    plane_busy_d = {aid: [] for aid, _, _ in FLEET}
-    for t in all_trips:
-        s = t["departures"][0]; e = t["arrivals"][-1] + TURNAROUND
-        plane_busy_d[t["aircraft_id"]].append((s, e))
-    def is_plane_free_d(aid, s, e):
-        for a, b in plane_busy_d[aid]:
-            if not (b <= s or a >= e):
-                return False
-        return True
-    # 按时间节省降序处理（贪心），避免飞机占用冲突
-    swap_cands = []
-    for t in all_trips:
-        if t["atype"] != "T3":
-            continue
-        stops = t["stops"]
-        # 峰值座位
-        on = [0]*len(stops); off = [0]*len(stops)
-        for _, pi, di, _ in t["pax"]:
-            on[pi] += 1; off[di] += 1
-        cur = 0; peak = 0
-        for i in range(len(stops)-1):
-            cur += on[i] - off[i]; peak = max(peak, cur)
-        if peak > AIRCRAFT["T2"]["seats"]:
-            continue
-        ok2, rf2 = fuel_ok(stops, "T2", D)
-        if not ok2:
-            continue
-        new_time = flight_time_minutes(stops, "T2", rf2, D)
-        old_time = flight_time_minutes(stops, "T3", t["refuels"], D)
-        if new_time > old_time:
-            continue  # 时间增加则不换（保主目标）
-        # 用 T2 重算时刻（保持原起飞时刻）
-        depart = t["departures"][0]
-        ac = AIRCRAFT["T2"]
-        arrs = [None]*len(stops); deps = [None]*len(stops)
-        cur_t = depart; deps[0] = depart
-        for i in range(len(stops)-1):
-            seg = flight_minutes(D[(stops[i], stops[i+1])], ac["speed"])
-            cur_t += seg; arrs[i+1] = cur_t
-            if i+1 < len(stops)-1:
-                dwell = DWELL_REFUEL if rf2[i+1] else DWELL_NO_REFUEL
-                cur_t += dwell; deps[i+1] = cur_t
-        arrs[-1] = cur_t
-        # 运营窗与不过夜校验
-        if date_of(cur_t) != date_of(depart):
-            continue
-        if cur_t - date_of(depart)*1440 > RET_LIMIT:
-            continue
-        # pax 时间窗校验（起飞时刻不变，但各站到达/离开可能提前，需重校 delivery<=la, pickup>=ep）
-        pax_ok = True
-        for pid, pi, di, p in t["pax"]:
-            ep = to_min(datetime.strptime(p["earliest_pickup_time"], FMT))
-            la = to_min(datetime.strptime(p["latest_arrival_time"], FMT))
-            if deps[pi] < ep or arrs[di] > la:
-                pax_ok = False; break
-        if not pax_ok:
-            continue
-        # 查同机场 T2 飞机在该区间是否空闲
-        trip_start = depart
-        trip_end = cur_t + TURNAROUND
-        cands = [(aid, ap) for aid, ap, t3 in FLEET if ap == t["airport"] and t3 == "T2"]
-        aid_new = None
-        for aid2, _ in cands:
-            if is_plane_free_d(aid2, trip_start, trip_end):
-                aid_new = aid2; break
-        if aid_new is None:
-            continue
-        old_fuel = total_fuel_kg(stops, "T3", D)
-        new_fuel = total_fuel_kg(stops, "T2", D)
-        swap_cands.append((old_time - new_time, old_fuel - new_fuel, t, aid_new, rf2, arrs, deps, cur_t))
-    swap_cands.sort(key=lambda x: -x[0])  # 时间节省大的优先
-    for ts_save, fs_save, t, aid_new, rf2, arrs, deps, cur_t in swap_cands:
-        trip_start = t["departures"][0]
-        trip_end = cur_t + TURNAROUND
-        # 重新校验飞机仍空闲（前面的换型可能已占用）
-        if not is_plane_free_d(aid_new, trip_start, trip_end):
-            continue
-        # 释放原 T3 飞机区间，占用新 T2 飞机区间
-        old_s = t["departures"][0]; old_e = t["arrivals"][-1] + TURNAROUND
-        plane_busy_d[t["aircraft_id"]] = [(s, e) for s, e in plane_busy_d[t["aircraft_id"]]
-                                          if not (s == old_s and e == old_e)]
-        plane_busy_d[aid_new].append((trip_start, trip_end))
-        # 应用换型
-        t["aircraft_id"] = aid_new
-        t["atype"] = "T2"
-        t["refuels"] = rf2
-        t["arrivals"] = arrs
-        t["departures"] = deps
-        swapped += 1
-        swap_time_save += ts_save
-        swap_fuel_save += fs_save
-    if swapped:
-        print(f"阶段D(机型换型): {swapped} 个 T3 架次降为 T2（时间-{swap_time_save}min, 燃油-{swap_fuel_save:.0f}kg）")
-    # === 阶段E：停靠序重排（TSP）。对每个含 ≥2 设施的架次，在满足 pickup-before-delivery
-    # 约束的所有设施排列中找最短距离序，若不增飞机使用时间、续航可行、pax 时间窗兼容、
-    # 运营窗满足则采用。同一机场保持原起飞时刻；重排后各站到达/离开提前，故飞机区间
-    # 为原区间子集，无新增飞机冲突。对总飞机使用时间（主目标）严格改善。
-    reordered = 0
-    reorder_save = 0
-    from itertools import permutations as _perms
-    for t in all_trips:
-        stops = t["stops"]; airport = stops[0]; facs = stops[1:-1]
-        if len(facs) < 2:
-            continue
-        # pickup-before-delivery 约束（基于现有 stops 索引）
-        constraints = []
-        for pid, pi, di, _ in t["pax"]:
-            if 0 < pi < len(stops)-1 and 0 < di < len(stops)-1 and pi < di:
-                constraints.append((stops[pi], stops[di]))
-        cur_d = sum(D[(stops[i], stops[i+1])] for i in range(len(stops)-1))
-        best = None  # (new_time, new_stops, rf, arrs, deps, ret)
-        for perm in _perms(facs):
-            pos = {f: i for i, f in enumerate(perm)}
-            if any(pos[pf] >= pos[df] for pf, df in constraints):
+    # === 阶段D/E 迭代：机型换型(T3→T2) 与 停靠序重排(TSP) 交替至收敛 ===
+    for _de_iter in range(1, 20):
+        # === 阶段D：机型换型（T3→T2 降型）。对每个 T3 架次，若 T2 续航可行、峰值座位≤16、
+        # 时间不增（T2 更快，且不引入额外加油 dwell）、pax 时间窗兼容、且同机场有 T2 飞机在该
+        # 区间空闲，则换型。T2 比 T3 更快（220 vs 190 km/h）且更省油（2.5 vs 2.9 kg/km），
+        # 因此 T3→T2 是对总飞机使用时间（主目标）与总燃油（次目标）的双赢。
+        # 只做 T3→T2（不做 T2→T1：T1 虽更快但更费油，会牺牲燃油次目标）。
+        swapped = 0
+        swap_time_save = 0
+        swap_fuel_save = 0.0
+        # 构建飞机忙区间表（区间冲突检测），用于换型时查 T2 飞机可用性
+        plane_busy_d = {aid: [] for aid, _, _ in FLEET}
+        for t in all_trips:
+            s = t["departures"][0]; e = t["arrivals"][-1] + TURNAROUND
+            plane_busy_d[t["aircraft_id"]].append((s, e))
+        def is_plane_free_d(aid, s, e):
+            for a, b in plane_busy_d[aid]:
+                if not (b <= s or a >= e):
+                    return False
+            return True
+        # 按时间节省降序处理（贪心），避免飞机占用冲突
+        swap_cands = []
+        for t in all_trips:
+            if t["atype"] != "T3":
                 continue
-            new_stops = [airport] + list(perm) + [airport]
-            d = sum(D[(new_stops[i], new_stops[i+1])] for i in range(len(new_stops)-1))
-            if d >= cur_d:
+            stops = t["stops"]
+            # 峰值座位
+            on = [0]*len(stops); off = [0]*len(stops)
+            for _, pi, di, _ in t["pax"]:
+                on[pi] += 1; off[di] += 1
+            cur = 0; peak = 0
+            for i in range(len(stops)-1):
+                cur += on[i] - off[i]; peak = max(peak, cur)
+            if peak > AIRCRAFT["T2"]["seats"]:
                 continue
-            ok, rf = fuel_ok(new_stops, t["atype"], D)
-            if not ok:
+            ok2, rf2 = fuel_ok(stops, "T2", D)
+            if not ok2:
                 continue
-            new_t = flight_time_minutes(new_stops, t["atype"], rf, D)
-            if new_t >= flight_time_minutes(stops, t["atype"], t["refuels"], D):
-                continue
-            # 重算时刻（保持原起飞时刻）
+            new_time = flight_time_minutes(stops, "T2", rf2, D)
+            old_time = flight_time_minutes(stops, "T3", t["refuels"], D)
+            if new_time > old_time:
+                continue  # 时间增加则不换（保主目标）
+            # 用 T2 重算时刻（保持原起飞时刻）
             depart = t["departures"][0]
-            ac = AIRCRAFT[t["atype"]]
-            arrs = [None]*len(new_stops); deps = [None]*len(new_stops)
+            ac = AIRCRAFT["T2"]
+            arrs = [None]*len(stops); deps = [None]*len(stops)
             cur_t = depart; deps[0] = depart
-            for i in range(len(new_stops)-1):
-                seg = flight_minutes(D[(new_stops[i], new_stops[i+1])], ac["speed"])
+            for i in range(len(stops)-1):
+                seg = flight_minutes(D[(stops[i], stops[i+1])], ac["speed"])
                 cur_t += seg; arrs[i+1] = cur_t
-                if i+1 < len(new_stops)-1:
-                    dwell = DWELL_REFUEL if rf[i+1] else DWELL_NO_REFUEL
+                if i+1 < len(stops)-1:
+                    dwell = DWELL_REFUEL if rf2[i+1] else DWELL_NO_REFUEL
                     cur_t += dwell; deps[i+1] = cur_t
             arrs[-1] = cur_t
+            # 运营窗与不过夜校验
             if date_of(cur_t) != date_of(depart):
                 continue
             if cur_t - date_of(depart)*1440 > RET_LIMIT:
                 continue
-            # pax 时间窗校验（重映射 pickup/delivery 索引）
-            new_idx = {f: i for i, f in enumerate(new_stops)}
+            # pax 时间窗校验（起飞时刻不变，但各站到达/离开可能提前，需重校 delivery<=la, pickup>=ep）
             pax_ok = True
             for pid, pi, di, p in t["pax"]:
                 ep = to_min(datetime.strptime(p["earliest_pickup_time"], FMT))
                 la = to_min(datetime.strptime(p["latest_arrival_time"], FMT))
-                npi = 0 if pi == 0 else new_idx[stops[pi]]
-                ndi = len(new_stops)-1 if di == len(stops)-1 else new_idx[stops[di]]
-                if npi >= ndi or deps[npi] < ep or arrs[ndi] > la:
+                if deps[pi] < ep or arrs[di] > la:
                     pax_ok = False; break
             if not pax_ok:
                 continue
-            if best is None or new_t < best[0]:
-                best = (new_t, new_stops, rf, arrs, deps, cur_t)
-        if best is not None:
-            new_t, new_stops, rf, arrs, deps, ret = best
-            old_t = flight_time_minutes(stops, t["atype"], t["refuels"], D)
-            # 应用重排：更新 stops/refuels/arrivals/departures，并重映射 pax 索引
-            new_idx = {f: i for i, f in enumerate(new_stops)}
-            new_pax = []
-            for pid, pi, di, p in t["pax"]:
-                npi = 0 if pi == 0 else new_idx[stops[pi]]
-                ndi = len(new_stops)-1 if di == len(stops)-1 else new_idx[stops[di]]
-                new_pax.append((pid, npi, ndi, p))
-            t["stops"] = new_stops
-            t["refuels"] = rf
+            # 查同机场 T2 飞机在该区间是否空闲
+            trip_start = depart
+            trip_end = cur_t + TURNAROUND
+            cands = [(aid, ap) for aid, ap, t3 in FLEET if ap == t["airport"] and t3 == "T2"]
+            aid_new = None
+            for aid2, _ in cands:
+                if is_plane_free_d(aid2, trip_start, trip_end):
+                    aid_new = aid2; break
+            if aid_new is None:
+                continue
+            old_fuel = total_fuel_kg(stops, "T3", D)
+            new_fuel = total_fuel_kg(stops, "T2", D)
+            swap_cands.append((old_time - new_time, old_fuel - new_fuel, t, aid_new, rf2, arrs, deps, cur_t))
+        swap_cands.sort(key=lambda x: -x[0])  # 时间节省大的优先
+        for ts_save, fs_save, t, aid_new, rf2, arrs, deps, cur_t in swap_cands:
+            trip_start = t["departures"][0]
+            trip_end = cur_t + TURNAROUND
+            # 重新校验飞机仍空闲（前面的换型可能已占用）
+            if not is_plane_free_d(aid_new, trip_start, trip_end):
+                continue
+            # 释放原 T3 飞机区间，占用新 T2 飞机区间
+            old_s = t["departures"][0]; old_e = t["arrivals"][-1] + TURNAROUND
+            plane_busy_d[t["aircraft_id"]] = [(s, e) for s, e in plane_busy_d[t["aircraft_id"]]
+                                              if not (s == old_s and e == old_e)]
+            plane_busy_d[aid_new].append((trip_start, trip_end))
+            # 应用换型
+            t["aircraft_id"] = aid_new
+            t["atype"] = "T2"
+            t["refuels"] = rf2
             t["arrivals"] = arrs
             t["departures"] = deps
-            t["pax"] = new_pax
-            reordered += 1
-            reorder_save += old_t - new_t
-    if reordered:
-        print(f"阶段E(停靠序重排): {reordered} 个架次重排停靠序（时间-{reorder_save}min）")
+            swapped += 1
+            swap_time_save += ts_save
+            swap_fuel_save += fs_save
+        if swapped:
+            print(f"阶段D(机型换型): {swapped} 个 T3 架次降为 T2（时间-{swap_time_save}min, 燃油-{swap_fuel_save:.0f}kg）")
+        # === 阶段E：停靠序重排（TSP）。对每个含 ≥2 设施的架次，在满足 pickup-before-delivery
+        # 约束的所有设施排列中找最短距离序，若不增飞机使用时间、续航可行、pax 时间窗兼容、
+        # 运营窗满足则采用。同一机场保持原起飞时刻；重排后各站到达/离开提前，故飞机区间
+        # 为原区间子集，无新增飞机冲突。对总飞机使用时间（主目标）严格改善。
+        reordered = 0
+        reorder_save = 0
+        from itertools import permutations as _perms
+        for t in all_trips:
+            stops = t["stops"]; airport = stops[0]; facs = stops[1:-1]
+            if len(facs) < 2:
+                continue
+            # pickup-before-delivery 约束（基于现有 stops 索引）
+            constraints = []
+            for pid, pi, di, _ in t["pax"]:
+                if 0 < pi < len(stops)-1 and 0 < di < len(stops)-1 and pi < di:
+                    constraints.append((stops[pi], stops[di]))
+            cur_d = sum(D[(stops[i], stops[i+1])] for i in range(len(stops)-1))
+            best = None  # (new_time, new_stops, rf, arrs, deps, ret)
+            for perm in _perms(facs):
+                pos = {f: i for i, f in enumerate(perm)}
+                if any(pos[pf] >= pos[df] for pf, df in constraints):
+                    continue
+                new_stops = [airport] + list(perm) + [airport]
+                d = sum(D[(new_stops[i], new_stops[i+1])] for i in range(len(new_stops)-1))
+                if d >= cur_d:
+                    continue
+                ok, rf = fuel_ok(new_stops, t["atype"], D)
+                if not ok:
+                    continue
+                new_t = flight_time_minutes(new_stops, t["atype"], rf, D)
+                if new_t >= flight_time_minutes(stops, t["atype"], t["refuels"], D):
+                    continue
+                # 重算时刻（保持原起飞时刻）
+                depart = t["departures"][0]
+                ac = AIRCRAFT[t["atype"]]
+                arrs = [None]*len(new_stops); deps = [None]*len(new_stops)
+                cur_t = depart; deps[0] = depart
+                for i in range(len(new_stops)-1):
+                    seg = flight_minutes(D[(new_stops[i], new_stops[i+1])], ac["speed"])
+                    cur_t += seg; arrs[i+1] = cur_t
+                    if i+1 < len(new_stops)-1:
+                        dwell = DWELL_REFUEL if rf[i+1] else DWELL_NO_REFUEL
+                        cur_t += dwell; deps[i+1] = cur_t
+                arrs[-1] = cur_t
+                if date_of(cur_t) != date_of(depart):
+                    continue
+                if cur_t - date_of(depart)*1440 > RET_LIMIT:
+                    continue
+                # pax 时间窗校验（重映射 pickup/delivery 索引）
+                new_idx = {f: i for i, f in enumerate(new_stops)}
+                pax_ok = True
+                for pid, pi, di, p in t["pax"]:
+                    ep = to_min(datetime.strptime(p["earliest_pickup_time"], FMT))
+                    la = to_min(datetime.strptime(p["latest_arrival_time"], FMT))
+                    npi = 0 if pi == 0 else new_idx[stops[pi]]
+                    ndi = len(new_stops)-1 if di == len(stops)-1 else new_idx[stops[di]]
+                    if npi >= ndi or deps[npi] < ep or arrs[ndi] > la:
+                        pax_ok = False; break
+                if not pax_ok:
+                    continue
+                if best is None or new_t < best[0]:
+                    best = (new_t, new_stops, rf, arrs, deps, cur_t)
+            if best is not None:
+                new_t, new_stops, rf, arrs, deps, ret = best
+                old_t = flight_time_minutes(stops, t["atype"], t["refuels"], D)
+                # 应用重排：更新 stops/refuels/arrivals/departures，并重映射 pax 索引
+                new_idx = {f: i for i, f in enumerate(new_stops)}
+                new_pax = []
+                for pid, pi, di, p in t["pax"]:
+                    npi = 0 if pi == 0 else new_idx[stops[pi]]
+                    ndi = len(new_stops)-1 if di == len(stops)-1 else new_idx[stops[di]]
+                    new_pax.append((pid, npi, ndi, p))
+                t["stops"] = new_stops
+                t["refuels"] = rf
+                t["arrivals"] = arrs
+                t["departures"] = deps
+                t["pax"] = new_pax
+                reordered += 1
+                reorder_save += old_t - new_t
+        if reordered:
+            print(f"阶段E(停靠序重排): {reordered} 个架次重排停靠序（时间-{reorder_save}min）")
+        if swapped == 0 and reordered == 0:
+            break
+        if _de_iter > 1:
+            print(f"  D/E 迭代第{_de_iter}轮: D={swapped}, E={reordered}")
     T_total = trips_total_air_time(all_trips, D)
     temp_time = T_total - trips_total_air_time(trips, D)
     temp_served = sum(1 for p in temp if any(pid == p["person_id"] for t in all_trips for pid, _, _, _ in t["pax"]))
